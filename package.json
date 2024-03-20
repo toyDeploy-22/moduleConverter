@@ -1,0 +1,30 @@
+{
+  "name": "moduleconverter",
+  "version": "1.0.0",
+  "description": "json/PDF/CSV Backend converter",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node -r config/dotenv ./server.js",
+    "start": "node ./server.js"
+  },
+  "keywords": [
+    "convert",
+    "converter",
+    "conversion",
+    "json",
+    "pdf",
+    "csv"
+  ],
+  "author": "eelismey-jf",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.0",
+    "fs-extra": "^11.2.0",
+    "json-2-csv": "^5.5.0",
+    "multer": "^1.4.5-lts.1",
+    "pdfmake": "^0.2.10"
+  }
+}
