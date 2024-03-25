@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+
+form {
+text-align: center;
+}
+
+div {
+display: flex;
+justify-content: center;
+}
+
+.notShow {
+display: none;
+}
+
+.show {
+display: block;
+font-weight: bold;
+}
+
+p[value="ok"] {
+color: green;
+}
+
+p[value="nok"]{
+color: crimson;
+}
+</style>
+</head>
+<body>
+<form enctype="multipart/form-data">
+<p><b>Please upload your file</b></p>
+
+  <input type="file" name="jsFile" />
+  <br /><br />
+  <button type="submit">Done</button>
+<p class="notShow" value="ok" >Sucess!</p>
+<p class="notShow" value="nok" >Failed!</p>
+</form>
+<script>
+const form = document.getElementsByTagName("form")[0];
+const success = document.getElementsByTagName("p")[1];
+const failure = document.getElementsByTagName("p")[2];
+const myFile = document.getElements.ByTagName("input")[0];
+
+async function sendFile(e){
+try{
+e.preventDefault();
+const url = "http://localhost:5000/convert/js-2-json";
+const myForm = new FormData(); // key-value pair form object
+const formFile = myFile.files[0]; // ".files" instead of ".value" because we want the file.
+myForm.append("jsFile", formFile);
+/**
+IMPORTANT:
+Not include
+"headers: { "Content-Type": 'multipart/form-data' }"
+as this is done by the browser itself.
+
+PLEASE CHECK HOW TO DELETE THE FILE.
+**/
+await fetch(url, {
+method: 'POST', 
+body: myForm, 
+});
+console.log("sent");
+success.setAttribute("class", "show");
+} catch(err) {
+console.error({message: err});
+failure.setAttribute("class", "show");
+} 
+}
+form.addEventListener("submit", sendFile);
+</script>
+</body>
+</html>
