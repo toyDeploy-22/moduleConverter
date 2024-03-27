@@ -4,10 +4,9 @@ import { fileURLToPath } from "url";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import fs from "fs";
-
+import fsp from "fs/promises";
 // destruct/constants/variables
-const { createReadStream, createWriteStream } = fs;
+const { readFile, writeFile } = fsp;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
@@ -38,6 +37,8 @@ function jsCheck(file) {
         result.msg = "Not converted. Please make sure that the file has a javascript extension."
     } else {
         result.error = false;
+        result.code = 200;
+        result.msg = "File authorized."
     }
     return result;
 }
@@ -46,59 +47,31 @@ const jsUpload = multer({
 storage: jsonStorage,
 }).single("jsFile");
 
-function Js2Json() {
-    let result ={}; 
+async function Js2Json() {
+
+    try{
+    let result ={};  
+    const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
+    const content = new Object;
+
+    content.data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
+    const jsonBuffer = JSON.stringify(content);
     
-    try {
-   const reader = createReadStream(conversionFolder + newJsFile);
-    if(!reader){
-            result.error = true;
-            result.code = 401;
-            result.msg = "Cannot read the file.";
-            console.error(err);
-            return result;
-        } 
+    await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
+    
+    result.error = false;
+    result.code = 201;
+    result.file = join(join(conversionFolder, "./JSON"), newJsonName);
+    result.msg = "Your file has successfully been converted to JSON. You can download it.";
+    return result;
 
-        const jsonBuffer = JSON.stringify(reader); 
-
-        if(!jsonBuffer){
-            result.error = true;
-            result.code = 401;
-            result.msg = "Cannot identify the file content.";
-            console.error(err);
-            return result;
-        } 
-        
-        const newJsonName = "New_Convert-" + d.getTime() + ".json";
-        let newJson = createWriteStream(`${conversionFolder}/JSON/${newJsonName}`); 
-        
-        jsonBuffer.pipe(newJson);
-
-        newJson.on("finish", (err)=>{
-            if(err) {
+    } catch(err) { 
+        console.error(err);
         result.error = true;
         result.code = 500;
-        result.msg = "An eror occured during the end of the process: Please try again."
-        console.error(err);
-        return result
-    } else { 
-        console.log("JSON conversion succesful.");
-        result.file = `${conversionFolder}/JSON/${newJsonName}`;
-        result.code = 201;
-        result.msg = "JSON conversion succesful! You can download the file.";
+        result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;
     }
-});  
-
-} catch(err) { 
-    
-        console.error(err);
-        result.error = true;
-        result.code = 500;
-        result.msg = "An error occured, please contact your administrator."
-        return result;
-}
-}
-
+} 
 
 export { jsUpload, jsCheck, Js2Json };
