@@ -60,7 +60,9 @@ Not include
 "headers: { "Content-Type": 'multipart/form-data' }"
 as this is done by the browser itself.
 
-PLEASE CHECK HOW TO DELETE THE FILE.
+PLEASE CHECK HOW TO DELETE THE FILE: 
+We can use fs.unlink()
+try to use req.format and use setRequesHeader() to set response headers
 **/
 await fetch(url, {
 method: 'POST', 
