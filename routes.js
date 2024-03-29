@@ -48,7 +48,8 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
               })
             })
             );
-            return true;
+            res.write("Hello World!")
+            res.end();
         }
       })
 

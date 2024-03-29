@@ -43,6 +43,10 @@ color: green;
 p[value="nok"]{
 color: crimson;
 }
+
+a.fileLink {
+text-decoration: none;
+}
 </style>
 </head>
 <body>
@@ -50,16 +54,17 @@ color: crimson;
 <p><b>Please select the format of the file you want</b></p>
 <label for="fileSelection"></label>
 <select id="fileSelection">
-<option disabled>Select here</option>
+<option value="">Select here</option>
 <option value="toJson">From Javascript to JSON</option>
 <option value="toJs">From JSON to Javascript</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
   <button type="submit">Done</button>
-<p id="yourSelection" class="notShow"></p>  
+<p id="yourSelection" class="notShow"></p> 
 <p class="notShow" value="ok" >Sucess!</p>
 <p class="notShow" value="nok" >Failed!</p>
+<a id="fileLink" class="notShow">You can get your file here!</a>
 </form>
 <script>
 const form = document.getElementsByTagName("form")[0];
@@ -68,38 +73,55 @@ const success = document.getElementsByTagName("p")[2];
 const failure = document.getElementsByTagName("p")[3];
 const myFile = document.getElementsByTagName("input")[0];
 const format = document.getElementById("fileSelection");
-const urls = ["js-2-json", "json-2-js"];
-const conversion = new Object;
+const urls = [
+{
+id: "toJson",
+description: "From Javascript to JSON",
+url: "js-2-json"
+}, 
+{
+id: "toJs",
+description: "From JSON to Javascript",
+url: "json-2-js"
+}];
+let conversion = {status: ""};
+
+const downloadLink = document.getElementById("fileLink");
+
 
 function getUrl(ext) {
-switch (ext.toString()) {
+const finder = urls.filter((url)=>url.id === ext)[0]; 
+switch (finder.id){
 case "toJson": 
-conversion.status = true;
-conversion.url = urls[0];
-break;
-case "toJs":
-conversion.status = true;
-conversion.url = urls[1];
+case "toJs" :
+conversion = {status: true,
+...finder
+};
 break;
 default:
-conversion.status = false;
-conversion.url = ""; 
+conversion = {status: false,
+url: ""
 	}
-	return conversion;
+	}
 }
 
 function urlSelected(){
-if(!conversion.status && myFile.files[0] ){
+getUrl(format.value);
+
+if(!conversion.status){
 userSelection.setAttribute("class", "notSelected");
-userSelection.innerHTML = "You will need to select a type of conversion to proceed the conversion."
-} else if (!conversion.status && !myFile.files[0]){
+userSelection.innerHTML = "Now, you just need to select a type of conversion to proceed."
+} 
+/**
+else if (conversion.status && !myFile.files[0]){
 userSelection.setAttribute("class", "notSelected");
 userSelection.innerHTML = "You will need to upload a file in order to proceed the conversion."
-	} else {
+	}**/ 
+	else {
 	userSelection.setAttribute("class", "readySelected");
 userSelection.innerHTML = "You have selected: ";
 const boldElem = document.createElement("b");
-const boldText = document.createTextNode(format.toString());
+const boldText = document.createTextNode(conversion.description);
 boldElem.appendChild(boldText);
 userSelection.appendChild(boldElem);
 	}
@@ -110,7 +132,7 @@ format.addEventListener("change", urlSelected)
 async function sendFile(e){
 try{
 e.preventDefault(); 
-if(conversion.url) { 
+if(conversion.status) { 
 const url = `http://localhost:5000/convert/${conversion.url}`;
 const myForm = new FormData(); // key-value pair form object
 const formFile = myFile.files[0]; // ".files" instead of ".value" because we want the file.
@@ -131,9 +153,11 @@ body: myForm,
 });
 console.log("sent");
 success.setAttribute("class", "show");
+downloadLink.classList.remove("notShow");
+//downloadLink.setAttribute(
 	} else {
 userSelection.setAttribute("class", "notSelected");
-userSelection.innerHTML = "Make sure you have uploaded a file and select a format before submission"
+userSelection.innerHTML = "Make sure you have uploaded a file and selected a format before submission"
 }	
 } catch(err) {
 console.error({message: err});
