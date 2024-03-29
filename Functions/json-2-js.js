@@ -4,41 +4,43 @@ import { fileURLToPath } from "url";
 // Local:
 // 3rd Party:
 import multer from "multer";
+import fse from "fs-extra";
 import fsp from "fs/promises";
 // destruct/constants/variables
-const { readFile, writeFile } = fsp;
+const { readJson } = fse;
+const { writeFile } = fsp;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
-let newJsFile;
+let newJsonFile;
 
-const jsonStorage = multer.diskStorage({
+const jsStorage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, `${conversionFolder}/UPLOAD`)
     },
     filename: function (req, file, cb) {
       const jsonName = `New_Json-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
-      newJsFile = jsonName + ExtName;
-      cb(null, newJsFile)
+      newJsonFile = jsonName + ExtName;
+      cb(null, newJsonFile)
     }
 });
 
-const jsUpload = multer({
-    storage: jsonStorage,
-    }).single("jsFile");
+const jsonUpload = multer({
+    storage: jsStorage,
+    }).single("uplFile");
 
-function jsCheck(file) {
+function jsonCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
     const result = new Object;
-    const checkFormat = extensionFormat === '.js' || 
-    authorizedFormat.filter((fmt)=>fmt.toLowerCase() === "javascript").length > 0;
+    const checkFormat = extensionFormat === '.json' || 
+    authorizedFormat.filter((fmt)=>fmt.toLowerCase() === "json").length > 0;
 
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.msg = "Not converted. Please make sure that the file has a javascript extension."
+        result.msg = "Not converted. Please make sure that the file has a json extension."
     } else {
         result.error = false;
         result.code = 200;
@@ -47,24 +49,24 @@ function jsCheck(file) {
     return result;
 }
 
-async function Js2Json() {
+async function Json2Js() {
 
     try{
     let result ={};  
-    const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
+    const newJsName = "New_Convert-" + d.getTime() + ".js"; 
     const content = new Object;
-
-    content.data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
-    const jsonBuffer = JSON.stringify(content);
+// await readFile(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"});
+    content.data = await readJson(join(join(conversionFolder,"./UPLOAD"), newJsonFile));
+    const jsonBuffer = JSON.parse(content);
     
-    await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
+    await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
     
     result.error = false;
     result.code = 201;
-    result.newFileName = newJsonName;
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-    result.filePath = join(join(conversionFolder, "./JSON"), newJsonName);
-    result.msg = "JS file successfully converted to JSON. Ready for download.";
+    result.newFileName = newJsName;
+    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+    result.filePath = join(join(conversionFolder, "./JS"), newJsName);
+    result.msg = "JSON file successfully converted to JS. Ready for download.";
     return result;
 
     } catch(err) { 
@@ -76,4 +78,4 @@ async function Js2Json() {
     }
 } 
 
-export { jsUpload, jsCheck, Js2Json };
+export { jsonUpload, jsonCheck, Json2Js };

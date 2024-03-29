@@ -1,10 +1,11 @@
 // Core:
 import  { dirname, join, extname } from "path";
 import { fileURLToPath } from "url";
+import fsp from "fs/promises";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import fsp from "fs/promises";
+
 // destruct/constants/variables
 const { readFile, writeFile } = fsp;
 
@@ -26,7 +27,7 @@ const jsonStorage = multer.diskStorage({
 
 const jsUpload = multer({
     storage: jsonStorage,
-    }).single("jsFile");
+    }).single("uplFile");
 
 function jsCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
