@@ -73,6 +73,7 @@ async function Json2Js() {
         console.error(err);
         result.error = true;
         result.code = 500;
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
         result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;
     }

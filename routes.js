@@ -55,7 +55,14 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
             );
         }
       } catch(err) { 
-        const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
+        const msg = "An error occured during the process. Make sure that the syntax of your file is correct.";
+        err.originalFilePath.unlink(file, (err)=>{
+          if(err){
+            console.error("Cannot destruct file uploaded: ", err)
+          } else {
+            console.log("File uploaded destruct OK")
+          }
+        })
         res.status( 500 ).send( err.msg || msg )}
       })
 
@@ -107,6 +114,13 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
         }
       } catch(err) { 
         const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
+        err.originalFilePath.unlink(file, (err)=>{
+          if(err){
+            console.error("Cannot destruct file uploaded: ", err)
+          } else {
+            console.log("File uploaded destruct OK")
+          }
+        })
         res.status( 500 ).send( err.msg || msg )}
       })
 
