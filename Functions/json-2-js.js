@@ -49,16 +49,17 @@ function jsonCheck(file) {
     return result;
 }
 
-async function Json2Js() {
+async function Json2Js() { 
+    
+    let result ={};
 
-    try{
-    let result ={};  
+    try{  
     const newJsName = "New_Convert-" + d.getTime() + ".js"; 
     const content = new Object;
 // await readFile(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"});
     content.data = await readJson(join(join(conversionFolder,"./UPLOAD"), newJsonFile));
-    const jsonBuffer = JSON.parse(content);
-    
+    const jsonBuffer = await JSON.parse(content);
+
     await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
     
     result.error = false;
@@ -68,7 +69,6 @@ async function Json2Js() {
     result.filePath = join(join(conversionFolder, "./JS"), newJsName);
     result.msg = "JSON file successfully converted to JS. Ready for download.";
     return result;
-
     } catch(err) { 
         console.error(err);
         result.error = true;

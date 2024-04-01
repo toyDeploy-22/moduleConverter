@@ -48,10 +48,11 @@ function jsCheck(file) {
     return result;
 }
 
-async function Js2Json() {
+async function Js2Json() { 
+    
+    let result ={};
 
     try{
-    let result ={};  
     const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
     const content = new Object;
 

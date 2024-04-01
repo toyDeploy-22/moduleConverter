@@ -10,8 +10,9 @@ import Express from "express";
 // destruct/constants/variables
 const convertPath = Express.Router();
 
-convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
-
+convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{ 
+  
+  try {
         console.log(req.body, req.file); 
         const checker = jsCheck(req.file); 
         console.log("checker :" + checker);
@@ -30,13 +31,17 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
 // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
           const { newFileName, originalFilePath, filePath} = newJsFile;
           const options = {
-            "Content-Type": "application/json",
+            "Content-Type": "text/javascript",
             "Content-Source": "upload",
             "Document-Name": newFileName,
             "Transmission": "download"
           };
-          res.writeHead(201, { options });
+         // res.writeHead(201, { options });
+         for(let [key, val] of Object.entries(options)) {
+          res.append(key, val);
+         }
           await pipeline(createReadStream(filePath), res);
+          res.status(201);
           await Promise.all(
             [originalFilePath, filePath].map((file, _ind)=>{ 
               unlink(file, (err)=>{
@@ -48,13 +53,16 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
               })
             })
             );
-            res.write("Hello World!")
-            res.end();
         }
+      } catch(err) { 
+        const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
+        res.status( 500 ).send( err.msg || msg )}
       })
 
 
-      convertPath.post("/json-2-js", cors(), jsonUpload, async(req, res, next )=>{
+      convertPath.post("/json-2-js", cors(), jsonUpload, async(req, res, next )=>{ 
+        
+        try {
 
         console.log(req.body, req.file); 
         const checker = jsonCheck(req.file); 
@@ -79,8 +87,12 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
             "Document-Name": newFileName,
             "Transmission": "download"
           };
-          res.writeHead(201, { options });
+         // res.writeHead(201, { options });
+         for(let [key, val] of Object.entries(options)) {
+          res.append(key, val);
+         }
           await pipeline(createReadStream(filePath), res);
+          res.status(201);
           await Promise.all(
             [originalFilePath, filePath].map((file, _ind)=>{ 
               unlink(file, (err)=>{
@@ -92,8 +104,10 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
               })
             })
             );
-            return true;
         }
+      } catch(err) { 
+        const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
+        res.status( 500 ).send( err.msg || msg )}
       })
 
 

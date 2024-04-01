@@ -75,12 +75,12 @@ const myFile = document.getElementsByTagName("input")[0];
 const format = document.getElementById("fileSelection");
 const urls = [
 {
-id: "toJson",
+id: "JstoJson",
 description: "From Javascript to JSON",
 url: "js-2-json"
 }, 
 {
-id: "toJs",
+id: "JsontoJs",
 description: "From JSON to Javascript",
 url: "json-2-js"
 }];
@@ -92,8 +92,8 @@ const downloadLink = document.getElementById("fileLink");
 function getUrl(ext) {
 const finder = urls.filter((url)=>url.id === ext)[0]; 
 switch (finder.id){
-case "toJson": 
-case "toJs" :
+case "JstoJson": 
+case "JsontoJs" :
 conversion = {status: true,
 ...finder
 };
@@ -147,15 +147,22 @@ PLEASE CHECK HOW TO DELETE THE FILE:
 We can use fs.unlink()
 try to use req.format and use setRequesHeader() to set response headers
 **/
-await fetch(url, {
+const Resp = await fetch(url, {
 method: 'POST', 
 body: myForm, 
 });
+if(Resp.ok) {
 console.log("sent");
+console.log(Resp)
 success.setAttribute("class", "show");
 downloadLink.classList.remove("notShow");
+return true;
 //downloadLink.setAttribute(
 	} else {
+	const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
+	console.error(msg);
+failure.setAttribute("class", "show");
+	}} else {
 userSelection.setAttribute("class", "notSelected");
 userSelection.innerHTML = "Make sure you have uploaded a file and selected a format before submission"
 }	
