@@ -1,6 +1,7 @@
 // Core:
 // Local:
-import convertPath from "./routes.js";
+import Json_convertions from "./json-routes.js";
+import csv_convertions from "./csv-routes.js";
 import sendError from "./Functions/errorEvents.js";
 // 3rd Party:
 import Express from "express";
@@ -12,7 +13,8 @@ const myPort = MY_PORT || 5000;
 
 // middlewares
 myServer.use(Express.json());
-myServer.use("/convert",convertPath);
+myServer.use("/convert", Json_convertions);
+myServer.use("/convert", csv_convertions);
 myServer.use(sendError);
 // server
 myServer.listen(myPort, ()=>{

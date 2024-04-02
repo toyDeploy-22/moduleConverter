@@ -48,35 +48,17 @@ function jsCheck(file) {
     return result;
 }
 
-async function Js2Json() { 
-    
-    let result ={};
+function Csv2Js(){
+    const Array2d = csv.filter(Array.isArray).length > 0;
+    let csvContent = [];
 
-    try{
-    const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
-    const content = new Object;
-
-    content.data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
-    const jsonBuffer = JSON.stringify(content);
-    
-    await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
-    
-    result.error = false;
-    result.code = 201;
-    result.newFileName = newJsonName;
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-    result.filePath = join(join(conversionFolder, "./JSON"), newJsonName);
-    result.msg = "JS file successfully converted to JSON. Ready for download.";
-    return result;
-
-    } catch(err) { 
-        console.error(err);
-        result.error = true;
-        result.code = 500;  
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-        result.msg = "The conversion process stopped due to the following issue: " + err;
-        return result;
+    if(Array2d) {
+        csvContent = csv.map((str)=>str.join()).join(", ")
+    } else { 
+        csvContent = csv.join(", ")
     }
-} 
+    
+    return csvContent;
+}
 
-export { jsUpload, jsCheck, Js2Json };
+export {};

@@ -8,9 +8,9 @@ import { jsonUpload, jsonCheck, Json2Js } from "./Functions/json-2-js.js";
 import cors from "cors";
 import Express from "express";
 // destruct/constants/variables
-const convertPath = Express.Router();
+const Json_convertions = Express.Router();
 
-convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{ 
+Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{ 
   
   try {
         console.log(req.body, req.file); 
@@ -67,7 +67,7 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
       })
 
 
-      convertPath.post("/json-2-js", cors(), jsonUpload, async(req, res, next )=>{ 
+      Json_convertions.post("/json-2-js", cors(), jsonUpload, async(req, res, next )=>{ 
         
         try {
 
@@ -125,4 +125,4 @@ convertPath.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
       })
 
 
-export default convertPath;
+export default Json_convertions;
