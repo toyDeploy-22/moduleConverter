@@ -1,6 +1,6 @@
 // Core:
-import { unlink, createReadStream } from "fs";
-import { pipeline } from "stream/promises";
+import { unlink } from "fs";
+// import { pipeline } from "stream/promises";
 // Local:
 import { jsUpload, jsCheck, Js2CSV } from "./Functions/js-2-csv.js";
 
@@ -29,41 +29,55 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           default:
           const newJsFile = await Js2CSV();
 // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
-          const { newFileName, originalFilePath, filePath} = newJsFile;
-          const options = {
-            "Content-Type": "text/javascript",
-            "Content-Source": "upload",
-            "Document-Name": newFileName,
-            "Transmission": "download"
-          };
-         // res.writeHead(201, { options });
-         for(let [key, val] of Object.entries(options)) {
-          res.append(key, val);
-         }
-          await pipeline(createReadStream(filePath), res);
-          res.status(201);
-          await Promise.all(
-            [originalFilePath, filePath].map((file, _ind)=>{ 
-              unlink(file, (err)=>{
-                if(err){
-                  console.error("Cannot destruct file nº " + Number(_ind+1) + ": ", err)
-                } else {
-                  console.log("File nº " + Number(_ind+1) + " destruction OK")
-                }
-              })
-            })
-            );
+        const { newFileName, originalFilePath, filePath, msg} = newJsFile;
+        const options = {
+        "Content-Type": "text/csv",
+        "Content-Source": "download",
+        "Document-Name": newFileName,
+        };
+        // I) Append object key/val to Header
+        // res.writeHead(201, { options });
+        for(let [key, val] of Object.entries(options)) {
+        res.append(key, val);
         }
-      } catch(err) { 
-        const msg = "An error occured during the process. Make sure that the syntax of your file is correct.";
-        err.originalFilePath.unlink(file, (err)=>{
-          if(err){
-            console.error("Cannot destruct file uploaded: ", err)
-          } else {
-            console.log("File uploaded destruct OK")
-          }
+        // II) Set response status:
+        res.status(201);
+        // III) Send File
+        // await pipeline(createReadStream(filePath), res);
+        res.download(filePath, (err)=>{
+        if(err){
+          console.error("Download process failed: " , err);
+        } else { 
+          console.log(msg)
+        }
         })
-        res.status( 500 ).send( err.msg || msg )}
-      })
+        // IV) Remove file
+        await Promise.all(
+          [originalFilePath, filePath].map((file, _ind)=>{ 
+            unlink(file, (err)=>{
+              if(err){
+                console.error("Cannot destruct file nº " + Number(_ind+1) + ": ", err)
+              } else {
+                console.log("File nº " + Number(_ind+1) + " destruction OK")
+            }
+            })
+          })
+          );
+        }
+        } catch(err) { 
+        const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";
+        if(err.originalFilePath) {
+        unlink(err.originalFilePath, (err)=>{
+        if(err){
+          console.error("Cannot destruct file uploaded: ", err)
+        } else {
+          console.log("File uploaded destruct OK")
+        }
+        })
+        } else {
+          console.log("No file found to destruct.")
+        }
+        res.status( 500 ).send( err.msg || msg_2 )}
+        })
 
       export default csv_convertions;

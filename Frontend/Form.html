@@ -55,8 +55,10 @@ text-decoration: none;
 <label for="fileSelection"></label>
 <select id="fileSelection">
 <option value="">Select here</option>
-<option value="toJson">From Javascript to JSON</option>
-<option value="toJs">From JSON to Javascript</option>
+<option disabled value="">--JAVASCRIPT/JSON--</option>
+<option value="JstoJson">From Javascript to JSON</option>
+<option value="JsontoJs">From JSON to Javascript</option>
+<option disabled value="">--JAVASCRIPT/CSV--</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
@@ -83,7 +85,18 @@ url: "js-2-json"
 id: "JsontoJs",
 description: "From JSON to Javascript",
 url: "json-2-js"
-}];
+},
+{
+id: "JstoCsv",
+description: "From Javascript to CSV",
+url: "js-2-csv"
+},
+{
+id: "CsvToJs",
+description: "From Javascript to CSV",
+url: "js-2-csv"
+}
+];
 let conversion = {status: ""};
 
 const downloadLink = document.getElementById("fileLink");

@@ -29,7 +29,7 @@ const csvUpload = multer({
     storage: csvStorage,
     }).single("uplFile");
 
-function csvCheck(file) {
+function jsCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
     const result = new Object;
@@ -48,7 +48,7 @@ function csvCheck(file) {
     return result;
 }
 
-async function csv2Js(){
+async function Csv2Js(){
     
     let result = {};
     
@@ -59,12 +59,12 @@ async function csv2Js(){
     const newJsName = "New_Convert-" + d.getTime() + ".js";
 
     if(Array2d) {
-        csvContent.push(csv.map((str)=>str.join()).join(","))
+        csvContent.push(csv.map((str)=>str.join() + "\n").join(","))
     } else { 
-        csvContent.push(csv.join(","))
+        csvContent.map((str, _ind, arr)=>(arr.indexOf(str) + 1)/2 !== 0 && arr.indexOf(str) !== 1 ? (str + ",\n") : (str + ",")).join("")
     }; 
     
-    writeFile(newJsName, csvContent);
+    writeFile()
 
     result.error = false;
     result.code = 201;
@@ -73,14 +73,8 @@ async function csv2Js(){
     result.filePath = join(join(conversionFolder, "./JS"), newJsName);
     result.msg = "CSV file successfully converted to JS. Ready for download.";
     return result;
+} catch(err) {
 
-} catch(err) { 
-    console.error(err);
-    result.error = true;
-    result.code = 500;
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.msg = "The conversion process stopped due to the following issue: " + err;
-    return result;
     }
 }
-export { csvUpload, csvCheck, csv2Js };
+export {};
