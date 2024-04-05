@@ -59,6 +59,8 @@ text-decoration: none;
 <option value="JstoJson">From Javascript to JSON</option>
 <option value="JsontoJs">From JSON to Javascript</option>
 <option disabled value="">--JAVASCRIPT/CSV--</option>
+<option value="JstoCsv">From Javascript to CSV</option>
+<option value="CsvtoJs">From CSV to Javascript</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
@@ -92,9 +94,9 @@ description: "From Javascript to CSV",
 url: "js-2-csv"
 },
 {
-id: "CsvToJs",
+id: "CsvtoJs",
 description: "From Javascript to CSV",
-url: "js-2-csv"
+url: "csv-2-js"
 }
 ];
 let conversion = {status: ""};
@@ -107,6 +109,8 @@ const finder = urls.filter((url)=>url.id === ext)[0];
 switch (finder.id){
 case "JstoJson": 
 case "JsontoJs" :
+case "JstoCsv" : 
+case "CsvtoJs" : 
 conversion = {status: true,
 ...finder
 };

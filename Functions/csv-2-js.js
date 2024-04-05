@@ -53,8 +53,9 @@ async function csv2Js(){
     let result = {};
     
     try {
-    const csv = await readFile((join(join(conversionFolder,"./UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
-    const Array2d = await csv.filter(Array.isArray).length > 0;
+    const originalFile = await readFile((join(join(conversionFolder,"./UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
+    const csv = [originalFile];
+    const Array2d = csv.filter(Array.isArray).length > 0;
     const csvContent = []; // for *txt extension, use let csvContent = "" 
     const newJsName = "New_Convert-" + d.getTime() + ".js";
 
@@ -64,7 +65,7 @@ async function csv2Js(){
         csvContent.push(csv.join(","))
     }; 
     
-    writeFile(newJsName, csvContent);
+    await writeFile(join(join(conversionFolder, "./JS"), newJsName), csvContent);
 
     result.error = false;
     result.code = 201;
