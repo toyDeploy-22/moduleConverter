@@ -95,7 +95,7 @@ url: "js-2-csv"
 },
 {
 id: "CsvtoJs",
-description: "From Javascript to CSV",
+description: "From CSV to Javascript",
 url: "csv-2-js"
 }
 ];
@@ -173,8 +173,9 @@ console.log("sent");
 console.log(Resp)
 success.setAttribute("class", "show");
 downloadLink.classList.remove("notShow");
-return true;
-//downloadLink.setAttribute(
+downloadLink.setAttribute("download", "");
+downloadLink.setAttribute("href",`${url}/getFile`);
+downloadLink.setAttribute("target", "_blank");
 	} else {
 	const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
 	console.error(msg);

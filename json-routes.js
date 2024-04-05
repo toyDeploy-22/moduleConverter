@@ -13,6 +13,7 @@ const Json_convertions = Express.Router();
 Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{ 
   
   try {
+    if(req.file.originalname) {
         console.log(req.body, req.file); 
         const checker = jsCheck(req.file); 
         console.log("checker :" + checker);
@@ -20,7 +21,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
         switch (checker.code.toString()[0]) {
           case "4": 
           console.error(checker.msg);
-          res.status(checker.code || 401).send(checker.msg); 
+          res.status(checker.code).send(checker.msg); 
           break; 
           case "2":   
           const newJsFile = await Js2Json();
@@ -60,6 +61,8 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
             })
           })
           )}, 500);
+        }} else {
+          res.status(400).send("No file uploaded.")
         }
       } catch(err) { 
         const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";
@@ -80,8 +83,8 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
 
       Json_convertions.post("/json-2-js", cors(), jsonUpload, async(req, res, next )=>{ 
         
-        try {
-
+        try { 
+          if(req.file.originalname) {
         console.log(req.body, req.file); 
         const checker = jsonCheck(req.file); 
         console.log("JSON checker :" + checker);
@@ -137,6 +140,8 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
         })
         )}, 500);
         break;
+      }}else {
+        res.status(400).send("No file uploaded.")
       }
       } catch(err) { 
         const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";

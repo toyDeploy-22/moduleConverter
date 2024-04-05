@@ -65,7 +65,10 @@ async function csv2Js(){
         csvContent.push(csv.join(","))
     }; 
     
-    await writeFile(join(join(conversionFolder, "./JS"), newJsName), csvContent);
+    await writeFile(join(join(conversionFolder, "./JS"), newJsName), csvContent); 
+   // const newCSV = createWriteStream(join(join(conversionFolder, "./JS"), newJsName)); 
+   // newCSV.write()
+
 
     result.error = false;
     result.code = 201;
