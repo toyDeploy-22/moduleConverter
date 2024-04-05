@@ -21,6 +21,13 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
         switch (checker.code.toString()[0]) {
           case "4": 
           console.error(checker.msg);
+          unlink(checker.destination, (err)=>{
+            if(err) {
+              console.error("No file found to destroy: " + err)
+            } else { 
+              console.log("File destroyed.")
+            }
+          });
           res.status(checker.code).send(checker.msg); 
           break; 
           case "2":   
@@ -49,17 +56,18 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
         }
         })
         // IV) Remove file
-        await Promise.all(
+        setTimeout(()=>{
+          Promise.all(
           [originalFilePath, filePath].map((file, _ind)=>{ 
             unlink(file, (err)=>{
               if(err){
-                console.error("Cannot destruct file nº " + Number(_ind+1) + ": ", err)
+                console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
               } else {
                 console.log("File nº " + Number(_ind+1) + " destruction OK")
             }
             })
           })
-          );
+          )}, 500);
           break;
         }
         } catch(err) { 
