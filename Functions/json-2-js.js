@@ -7,8 +7,8 @@ import multer from "multer";
 import fse from "fs-extra";
 import fsp from "fs/promises";
 // destruct/constants/variables
-const { readJson } = fse;
-const { writeFile } = fsp;
+const { readJson, createWriteStream } = fse;
+// const { writeFile } = fsp;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
@@ -55,12 +55,51 @@ async function Json2Js() {
 
     try{  
     const newJsName = "New_Convert-" + d.getTime() + ".js"; 
-    const content = new Object;
+    
 // await readFile(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"});
-    content.data = await readJson(join(join(conversionFolder,"./UPLOAD"), newJsonFile));
-    const jsonBuffer = await JSON.parse(content);
+    const jsonBuffer = await readJson(join(join(conversionFolder,"./UPLOAD"), newJsonFile)); 
 
-    await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
+    // const jsonBuffer = await JSON.parse(content);
+
+    // await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
+
+    const newContent = createWriteStream(join(join(conversionFolder, "./JS"), newJsName));
+
+    newContent.on("ready", (err)=>{
+        if(err) {
+        result.error = true; 
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+    result.filePath = join(join(conversionFolder, "./JS"), newJsName); 
+    result.msg = "Cannot start: " + err; 
+    return result 
+        } else {
+            console.log("Starting...")
+        }
+    });
+
+    newContent.write("[{")
+    
+
+    for(let [key, val] of Object.entries(jsonBuffer)) {
+    newContent.write(`${key}: ${typeof val === 'object' ? JSON.stringify(val) : val},\n`)
+    };
+
+    newContent.write("}]");
+
+    newContent.on("close", (err)=>{
+        if(err){ 
+            result.error = true; 
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+         result.filePath = join(join(conversionFolder, "./JS"), newJsName); 
+    result.msg = "Cannot end process: " + err; 
+    return result 
+        } else {
+            console.log("conversion ended.")
+        }
+    })
+
+
+    
     
     result.error = false;
     result.code = 201;
