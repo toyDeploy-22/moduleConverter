@@ -61,18 +61,7 @@ async function Js2Json() {
 
     let content = '';
 
-    typeof data === 'object' && variable !== null && !Array.isArray(data) ? content = JSON.stringify(data) : content = JSON.stringify({data: data});   
-
-
-    const characterEntry=(v)=>{
-        let value = v; 
-        if(typeof value === 'object') { 
-            value = JSON.stringify(value);
-        } else if(value === "") { 
-            value = undefined;         
-        }
-        return value;
-    };
+    typeof data === 'object' && variable !== null && !Array.isArray(data) ? content = JSON.stringify(data) : content = JSON.stringify({data: data});
     
     // const jsonBuffer = JSON.stringify(content);
     console.log(content)
@@ -86,6 +75,7 @@ async function Js2Json() {
     newContent.on("error", (err)=>{console.error("Oooopsie: " + err)})
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
     
+
     result.error = false;
     result.code = 201;
     result.newFileName = newJsonName;

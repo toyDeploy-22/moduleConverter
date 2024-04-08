@@ -153,13 +153,8 @@ userSelection.appendChild(boldElem);
 
 format.addEventListener("change", urlSelected)
 
-async function sendFile(e){
+async function sendFile(){
 try{
-e.preventDefault();
-waitEvent = true;
-const message = "Starting conversion...";
-waitingMsg.classList.remove("notShow");
-waitingMsg.innerHTML = message;
 if(conversion.status) { 
 const url = `http://localhost:5000/convert/${conversion.url}`;
 const myForm = new FormData(); // key-value pair form object
@@ -206,8 +201,12 @@ console.error({message: err});
 failure.setAttribute("class", "show");
 } 
 }
-const sendFileAsync = () => {
-
+const sendFileAsync = (e) => {
+e.preventDefault();
+waitEvent = true;
+const message = "Starting conversion...";
+waitingMsg.classList.remove("notShow");
+waitingMsg.innerHTML = message;
 setTimeout(sendFile, 2000)
 }
 

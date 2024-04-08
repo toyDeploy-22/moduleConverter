@@ -113,7 +113,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
           }
           })
         })
-        )}, 500);
+        )}, 150);
         downloadFile = {};
       } else {
         res.status(400).send("No file uploaded.")
