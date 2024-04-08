@@ -5,9 +5,11 @@ import fsp from "fs/promises";
 // Local:
 // 3rd Party:
 import multer from "multer";
+import fse from "fs-extra";
 
 // destruct/constants/variables
-const { readFile, writeFile } = fsp;
+const { readFile } = fsp;
+const { createWriteStream } = fse;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
@@ -54,12 +56,35 @@ async function Js2Json() {
 
     try{
     const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
-    const content = new Object;
-
-    content.data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
-    const jsonBuffer = JSON.stringify(content);
     
-    await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
+    let data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
+
+    let content = '';
+
+    typeof data === 'object' && variable !== null && !Array.isArray(data) ? content = JSON.stringify(data) : content = JSON.stringify({data: data});   
+
+
+    const characterEntry=(v)=>{
+        let value = v; 
+        if(typeof value === 'object') { 
+            value = JSON.stringify(value);
+        } else if(value === "") { 
+            value = undefined;         
+        }
+        return value;
+    };
+    
+    // const jsonBuffer = JSON.stringify(content);
+    console.log(content)
+    const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName), {
+        encoding: 'ascii'
+    });
+    
+    newContent.write("[");
+    newContent.write(content);
+    newContent.write("]")
+    newContent.on("error", (err)=>{console.error("Oooopsie: " + err)})
+    // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
     
     result.error = false;
     result.code = 201;

@@ -5,10 +5,9 @@ import { fileURLToPath } from "url";
 // 3rd Party:
 import multer from "multer";
 import fse from "fs-extra";
-import fsp from "fs/promises";
+
 // destruct/constants/variables
 const { readJson, createWriteStream } = fse;
-// const { writeFile } = fsp;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
@@ -65,42 +64,27 @@ async function Json2Js() {
 
     const newContent = createWriteStream(join(join(conversionFolder, "./JS"), newJsName));
 
-    newContent.on("ready", (err)=>{
-        if(err) {
-        result.error = true; 
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
-    result.filePath = join(join(conversionFolder, "./JS"), newJsName); 
-    result.msg = "Cannot start: " + err; 
-    return result 
-        } else {
-            console.log("Starting...")
+    const characterEntry=(v)=>{
+        let value = v; 
+        if(typeof value === 'object') { 
+            value = JSON.stringify(value);
+        } else if(value === "") { 
+            value = undefined;         
         }
-    });
-
-    newContent.write("[{")
-    
-
-    for(let [key, val] of Object.entries(jsonBuffer)) {
-    newContent.write(`${key}: ${typeof val === 'object' ? JSON.stringify(val) : val},\n`)
+        return value;
     };
 
-    newContent.write("}]");
-
-    newContent.on("close", (err)=>{
-        if(err){ 
-            result.error = true; 
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
-         result.filePath = join(join(conversionFolder, "./JS"), newJsName); 
-    result.msg = "Cannot end process: " + err; 
-    return result 
-        } else {
-            console.log("conversion ended.")
+    newContent.write("[{"); 
+        
+    for(let [key, val] of Object.entries(jsonBuffer)) {
+            newContent.write(`${key}: ${characterEntry(val)},\n`) 
         }
+            
+    newContent.write("}]");
+    newContent.on("error", (err)=>{
+        console.error("JSON Writing error conversion to JS: " + err)
     })
 
-
-    
-    
     result.error = false;
     result.code = 201;
     result.newFileName = newJsName;

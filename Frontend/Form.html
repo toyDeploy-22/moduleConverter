@@ -44,6 +44,10 @@ p[value="nok"]{
 color: crimson;
 }
 
+p.waiting {
+font-weight: bold;
+}
+
 a.fileLink {
 text-decoration: none;
 }
@@ -68,6 +72,7 @@ text-decoration: none;
 <p id="yourSelection" class="notShow"></p> 
 <p class="notShow" value="ok" >Sucess!</p>
 <p class="notShow" value="nok" >Failed!</p>
+<p class="waiting" class="notShow"></p>
 <a id="fileLink" class="notShow">You can get your file here!</a>
 </form>
 <script>
@@ -75,8 +80,10 @@ const form = document.getElementsByTagName("form")[0];
 const userSelection = document.getElementsByTagName("p")[1];
 const success = document.getElementsByTagName("p")[2];
 const failure = document.getElementsByTagName("p")[3];
+const waitingMsg = document.getElementsByTagName("p")[4];
 const myFile = document.getElementsByTagName("input")[0];
 const format = document.getElementById("fileSelection");
+let waitEvent = false;
 const urls = [
 {
 id: "JstoJson",
@@ -148,7 +155,11 @@ format.addEventListener("change", urlSelected)
 
 async function sendFile(e){
 try{
-e.preventDefault(); 
+e.preventDefault();
+waitEvent = true;
+const message = "Starting conversion...";
+waitingMsg.classList.remove("notShow");
+waitingMsg.innerHTML = message;
 if(conversion.status) { 
 const url = `http://localhost:5000/convert/${conversion.url}`;
 const myForm = new FormData(); // key-value pair form object
@@ -169,6 +180,8 @@ method: 'POST',
 body: myForm, 
 });
 if(Resp.ok) {
+waitEvent = false;
+waitingMsg.classList.add("notShow");
 console.log("sent");
 console.log(Resp)
 success.setAttribute("class", "show");
@@ -177,10 +190,14 @@ downloadLink.setAttribute("download", "");
 downloadLink.setAttribute("href",`${url}/getFile`);
 downloadLink.setAttribute("target", "_blank");
 	} else {
+	waitEvent = false;
+	waitingMsg.classList.add("notShow");
 	const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
 	console.error(msg);
 failure.setAttribute("class", "show");
 	}} else {
+waitEvent = false;
+waitingMsg.classList.add("notShow");	
 userSelection.setAttribute("class", "notSelected");
 userSelection.innerHTML = "Make sure you have uploaded a file and selected a format before submission"
 }	
@@ -189,7 +206,12 @@ console.error({message: err});
 failure.setAttribute("class", "show");
 } 
 }
-form.addEventListener("submit", sendFile);
+const sendFileAsync = () => {
+
+setTimeout(sendFile, 2000)
+}
+
+form.addEventListener("submit", sendFileAsync);
 </script>
 </body>
 </html>
