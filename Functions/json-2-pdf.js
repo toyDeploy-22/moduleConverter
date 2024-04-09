@@ -53,45 +53,56 @@ function pdfCheck(file) {
     return result;
 }
 
+const newPdfFile = "New_Convert-" + d.getTime() + ".pdf"; 
+
+const pdfMaking = async(pdfName) => {
+    
+    try {
+    const fonts = {
+        Roboto: {
+          normal: './CONVERSION/FONTS/Roboto-Regular.ttf'
+        }
+      };
+    
+    const Printer = new PdfPrinter(fonts);
+    
+    const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), pdfName));
+
+    let data = await readJSON(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"}); 
+    const dataContent = Array.isArray(data) ? JSON.stringify(data[0]) : JSON.stringify(data); 
+
+    const pdfContent = {
+        content: [
+        ]
+    }; 
+
+    for(let [key, value] of Object.entries(dataContent)) {
+     pdfContent.content.push({text: `{${key}: ${value},}`})   
+    }
+
+    const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
+    pdfDoc.pipe(newPdfDoc); 
+    pdfDoc.end();
+    } catch(err) {
+        console.error("PDF not created: " + err)
+    }
+}
+
 async function Json2Pdf() { 
     
     let result ={};
 
     try{
-        const fonts = {
-            Roboto: {
-              normal: './CONVERSION/FONTS/Roboto-Regular.ttf'
-            }
-          };
         
-        const Printer = new PdfPrinter(fonts);
-        const newPdfName = "New_Convert-" + d.getTime() + ".pdf"; 
-        const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), newPdfName));
-    
-        let data = await readJSON(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"}); 
-        const dataContent = Array.isArray(data) ? JSON.stringify(data[0]) : JSON.stringify(data); 
-
-        const pdfContent = {
-            content: [
-            ]
-        }; 
-
-        for(let [key, value] of Object.entries(dataContent)) {
-         pdfContent.content.push({text: `{${key}: ${value},}`})   
-        }
-    
-        const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
-        pdfDoc.pipe(newPdfDoc); 
-        pdfDoc.end();
-    
+    await pdfMaking(newPdfFile);
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
     
     result.error = false;
     result.code = 201;
-    result.newFileName = newPdfName;
+    result.newFileName = newPdfFile;
     result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
-    result.filePath = join(join(conversionFolder, "./PDF"), newPdfName);
+    result.filePath = join(join(conversionFolder, "./PDF"), newPdfFile);
     result.msg = "JSON file successfully converted to PDF. Ready for download.";
     return result;
 
