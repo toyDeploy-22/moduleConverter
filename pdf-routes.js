@@ -23,7 +23,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
         switch (checker.code.toString()[0]) {
           case "4": 
           console.error(checker.msg);
-          emptyDir(checker.originalFilePath, (err)=>{
+          emptyDir(checker.uploadFolder, (err)=>{
             if(err) {
               console.error("No file found to destroy: " + err)
             } else { 
@@ -39,13 +39,15 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
           downloadFile = {...newPdfFile};
           res.status(201).send("file can be downloaded.")
           } else { 
-            emptyDir(newPdfFile.originalFilePath, (err)=>{
-                if(err) {
-                  console.error("No file found to destroy: " + err)
-                } else { 
-                  console.log("File destroyed.")
-                }
-              });
+            if(newJsonFile.uploadFolder) {
+              emptyDir(err.uploadFolder, (err)=>{
+              if(err){
+                console.error("Cannot destroy file uploaded: ", err)
+              } else {
+                console.log("File uploaded destruction OK")
+              }
+              })
+              }
           res.status(500).send(newCsvFile.msg || "An error occured. Please try again.")
           }; 
           break;
@@ -73,16 +75,14 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             
               const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";
 
-              if(err.originalFilePath) {
-                emptyDir(err.originalFilePath, (err)=>{
+              if(err.uploadFolder) {
+                emptyDir(err.uploadFolder, (err)=>{
                 if(err){
                   console.error("Cannot destroy file uploaded: ", err)
                 } else {
                   console.log("File uploaded destruction OK")
                 }
                 })
-              } else {
-                console.log("No file found to destroy.")
               }
               res.status(500).send( err.msg || msg_2 )
             }
@@ -127,13 +127,15 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             res.status(400).send("No file uploaded.")
             } 
           } catch(err) { 
-            emptyDir(err.originalFilePath, (err)=>{
-                if(err) {
-                  console.error("No file found to destroy: " + err)
-                } else { 
-                  console.log("File destroyed.")
-                }
-              });
+            if(err.uploadFolder) {
+              emptyDir(err.uploadFolder, (err)=>{
+              if(err){
+                console.error("Cannot destroy file uploaded: ", err)
+              } else {
+                console.log("File uploaded destruction OK")
+              }
+              })
+              }
             res.status(500).send( err || "An error occured. Please try again." )
             }
           })
@@ -150,13 +152,13 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             switch (checker.code.toString()[0]) {
               case "4": 
               console.error(checker.msg);
-              unlink(checker.destination, (err)=>{
-                if(err) {
-                  console.error("No file found to destroy: " + err)
-                } else { 
-                  console.log("File destroyed.")
-                }
-              });
+              emptyDir(checker.uploadFolder, (err)=>{
+            if(err){
+              console.error("Cannot destroy file uploaded: ", err)
+            } else {
+              console.log("File uploaded destruction OK")
+            }
+            });
               res.status(checker.code).send(checker.msg); 
               break; 
               case "2":   
@@ -166,13 +168,15 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
              downloadFile = {...newJsFile};
             res.status(201).send("file can be downloaded.")
             } else { 
-                emptyDir(newJsFile.originalFilePath, (err)=>{
-                if(err) {
-                console.error("No file found to destroy: " + err)
-                } else { 
-                console.log("File destroyed.")
+                if(newJsFile.uploadFolder) {
+                emptyDir(newJsFile.uploadFolder, (err)=>{
+                if(err){
+                  console.error("Cannot destroy file uploaded: ", err)
+                } else {
+                  console.log("File uploaded destruction OK")
                 }
-            });
+                })
+                }
             res.status(500).send(newJsFile.msg || "An error occured. Please try again.")
             }; 
             break;
@@ -202,16 +206,14 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             
               const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";
             
-            if(err.originalFilePath) {
-            unlink(err.originalFilePath, (err)=>{
+            if(err.uploadFolder) {
+            emptyDir(err.uploadFolder, (err)=>{
             if(err){
               console.error("Cannot destroy file uploaded: ", err)
             } else {
               console.log("File uploaded destruction OK")
             }
             })
-            } else {
-              console.log("No file found to destroy.")
             }
             res.status(500).send( err.msg || msg_2 )
           }
@@ -254,13 +256,15 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
           res.status(400).send("No file uploaded.")
           } 
         } catch(err) { 
-            emptyDir(err.originalFilePath, (err)=>{
-            if(err) {
-            console.error("No file found to destroy: " + err)
-            } else { 
-            console.log("File destroyed.")
+            if(downloadFile.uploadFolder) {
+            emptyDir(downloadFile.uploadFolder, (err)=>{
+            if(err){
+              console.error("Cannot destroy file uploaded: ", err)
+            } else {
+              console.log("File uploaded destruction OK")
             }
-            });
+            })
+            }
           res.status(500).send( err || "An error occured. Please try again." )
           }
         })

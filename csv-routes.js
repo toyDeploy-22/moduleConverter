@@ -252,6 +252,16 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           )}, 500);
           downloadFile = {};
         } else {
+          if(downloadFile.uploadFolder) {
+            emptyDir(downloadFile.uploadFolder, (err)=>{
+            if(err){
+              console.error("Cannot destroy file uploaded: ", err)
+            } else {
+              console.log("File uploaded destruction OK")
+            }
+            })
+            }
+            downloadFile = {};
           res.status(400).send("No file uploaded.")
           } 
         } catch(err) { 
@@ -264,6 +274,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
             }
             })
             }
+            downloadFile = {};
           res.status(500).send( err || "An error occured. Please try again." )
           }
         })

@@ -5,6 +5,7 @@ import fse from "fs-extra";
 // Local:
 // 3rd Party:
 import multer from "multer";
+import pdfPrinter from "pdfmake";
 import PdfPrinter from "pdfmake";
 
 // destruct/constants/variables
@@ -59,23 +60,29 @@ async function Json2Pdf() {
     try{
         const fonts = {
             Roboto: {
-              normal: 'fonts/Roboto-Regular.ttf',
-              bold: 'fonts/Roboto-Medium.ttf',
-              italics: 'fonts/Roboto-Italic.ttf',
-              bolditalics: 'fonts/Roboto-MediumItalic.ttf'
+              normal: './CONVERSION/FONTS/Roboto-Regular.ttf'
             }
           };
-          
-          const printer = new PdfPrinter(fonts);
         
-          const newPdfName = "New_Convert-" + d.getTime() + ".pdf"; 
+        const Printer = new PdfPrinter(fonts);
+        const newPdfName = "New_Convert-" + d.getTime() + ".pdf"; 
+        const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), newPdfName));
     
-    let data = await readJSON(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"}); 
-    const content = Array.isArray(data) ? data[0] : data;
+        let data = await readJSON(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"}); 
+        const dataContent = Array.isArray(data) ? JSON.stringify(data[0]) : JSON.stringify(data); 
 
-    let pdfContent = printer.createPdfKitDocument(content);
+        const pdfContent = {
+            content: [
+            ]
+        }; 
+
+        for(let [key, value] of Object.entries(dataContent)) {
+         pdfContent.content.push({text: `{${key}: ${value},}`})   
+        }
     
-    await pdfContent.pipe(createWriteStream(join(join(conversionFolder, "./PDF"), newPdfName)));
+        const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
+        pdfDoc.pipe(newPdfDoc); 
+        pdfDoc.end();
     
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
     
