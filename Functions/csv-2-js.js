@@ -39,10 +39,12 @@ function csvCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
+        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
         result.msg = "Not converted. Please make sure that the file has a csv extension."
     } else {
         result.error = false;
         result.code = 200;
+        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
         result.msg = "File authorized."
     }
     return result;
@@ -73,6 +75,7 @@ async function csv2Js(){
     result.error = false;
     result.code = 201;
     result.newFileName = newJsName;
+    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
     result.filePath = join(join(conversionFolder, "./JS"), newJsName);
     result.msg = "CSV file successfully converted to JS. Ready for download.";
@@ -82,6 +85,7 @@ async function csv2Js(){
     console.error(err);
     result.error = true;
     result.code = 500;
+    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
     result.msg = "The conversion process stopped due to the following issue: " + err;
     return result;

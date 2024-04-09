@@ -1,0 +1,1 @@
+const pets = {name: "starsky"};

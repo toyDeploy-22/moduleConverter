@@ -1,5 +1,5 @@
 // Core:
-import { unlink } from "fs";
+import { emptyDir, remove } from "fs-extra";
 //import { pipeline } from "stream/promises";
 // Local:
 import { jsUpload, jsCheck, Js2Json } from "./Functions/js-2-json.js";
@@ -23,7 +23,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
         switch (checker.code.toString()[0]) {
           case "4": 
           console.error(checker.msg);
-          unlink(checker.destination, (err)=>{
+          emptyDir(checker.originalFilePath, (err)=>{
             if(err) {
               console.error("No file found to destroy: " + err)
             } else { 
@@ -39,6 +39,13 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
           downloadFile = {...newJsonFile};
           res.status(201).send("file can be downloaded.")
           } else { 
+            emptyDir(newJsonFile.originalFilePath, (err)=>{
+              if(err) {
+                console.error("No file found to destroy: " + err)
+              } else { 
+                console.log("File destroyed.")
+              }
+            });
           res.status(500).send(newJsonFile.msg || "An error occured. Please try again.")
           }; 
           break;
@@ -67,7 +74,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
           const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";
 
           if(err.originalFilePath) {
-            unlink(err.originalFilePath, (err)=>{
+            emptyDir(err.originalFilePath, (err)=>{
             if(err){
               console.error("Cannot destroy file uploaded: ", err)
             } else {
@@ -102,23 +109,31 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
       })
 
       // IV) Remove file
-      setTimeout(()=>{
-        Promise.all(
-        [originalFilePath, filePath].map((file, _ind)=>{ 
-          unlink(file, (err)=>{
+      setTimeout(async()=>{
+        await Promise.all(
+         [originalFilePath, filePath].map((file, _ind)=>{ 
+          remove(file, (err)=>{
             if(err){
               console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
             } else {
               console.log("File nº " + Number(_ind+1) + " destruction OK")
           }
-          })
+          });
         })
-        )}, 150);
+        )}, 100);
+        
         downloadFile = {};
       } else {
         res.status(400).send("No file uploaded.")
         } 
       } catch(err) { 
+        emptyDir(err.originalFilePath, (err)=>{
+          if(err) {
+            console.error("No file found to destroy: " + err)
+          } else { 
+            console.log("File destroyed.")
+          }
+        });
         res.status(500).send( err || "An error occured. Please try again." )
         }
       })
@@ -135,7 +150,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
         switch (checker.code.toString()[0]) {
           case "4": 
           console.error(checker.msg);
-          unlink(checker.destination, (err)=>{
+          emptyDir(checker.destination, (err)=>{
             if(err) {
               console.error("No file found to destroy: " + err)
             } else { 
@@ -151,6 +166,13 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
              downloadFile = {...newJsFile};
             res.status(201).send("file can be downloaded.")
             } else { 
+              emptyDir(newJsFile.originalFilePath, (err)=>{
+                if(err) {
+                  console.error("No file found to destroy: " + err)
+                } else { 
+                  console.log("File destroyed.")
+                }
+              });
             res.status(500).send(newJsFile.msg || "An error occured. Please try again.")
             }; 
             break;
@@ -181,7 +203,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
               const msg_2 = "An error occured during the process. Make sure that the syntax of your file is correct.";
             
             if(err.originalFilePath) {
-            unlink(err.originalFilePath, (err)=>{
+            emptyDir(err.originalFilePath, (err)=>{
             if(err){
               console.error("Cannot destroy file uploaded: ", err)
             } else {
@@ -216,10 +238,10 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
         })
 
         // IV) Remove file
-        setTimeout(()=>{
-          Promise.all(
+        setTimeout(async()=>{
+          await Promise.all(
           [originalFilePath, filePath].map((file, _ind)=>{ 
-            unlink(file, (err)=>{
+            remove(file, (err)=>{
               if(err){
                 console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
               } else {
@@ -233,6 +255,13 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
           res.status(400).send("No file uploaded.")
           } 
         } catch(err) { 
+          emptyDir(err.originalFilePath, (err)=>{
+            if(err) {
+              console.error("No file found to destroy: " + err)
+            } else { 
+              console.log("File destroyed.")
+            }
+          });
           res.status(500).send( err || "An error occured. Please try again." )
           }
         });

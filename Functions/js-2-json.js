@@ -41,10 +41,13 @@ function jsCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
+        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"));
         result.msg = "Not converted. Please make sure that the file has a javascript extension."
     } else {
         result.error = false;
         result.code = 200;
+        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
         result.msg = "File authorized."
     }
     return result;
@@ -64,7 +67,7 @@ async function Js2Json() {
     typeof data === 'object' && variable !== null && !Array.isArray(data) ? content = JSON.stringify(data) : content = JSON.stringify({data: data});
     
     // const jsonBuffer = JSON.stringify(content);
-    console.log(content)
+  
     const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName), {
         encoding: 'ascii'
     });
@@ -79,6 +82,7 @@ async function Js2Json() {
     result.error = false;
     result.code = 201;
     result.newFileName = newJsonName;
+    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
     result.filePath = join(join(conversionFolder, "./JSON"), newJsonName);
     result.msg = "JS file successfully converted to JSON. Ready for download.";
@@ -88,6 +92,7 @@ async function Js2Json() {
         console.error(err);
         result.error = true;
         result.code = 500;  
+        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
         result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;
