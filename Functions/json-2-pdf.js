@@ -73,11 +73,16 @@ const pdfMaking = async(pdfName) => {
 
     const pdfContent = {
         content: [
-        ]
+        ],
+        styles: {
+        defaultStyle: {
+            alignment: 'center'
+          }
+        }
     }; 
 
     for(let [key, value] of Object.entries(dataContent)) {
-     pdfContent.content.push({text: `${key}: ${value},`})   
+     pdfContent.content.push({text: `${key}: ${value},`, style: 'defaultStyle'})   
     }
 
     const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
