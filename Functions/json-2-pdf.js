@@ -69,7 +69,7 @@ const pdfMaking = async(pdfName) => {
     const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), pdfName));
 
     let data = await readJSON(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"}); 
-    const dataContent = Array.isArray(data) ? JSON.stringify(data[0]) : JSON.stringify(data); 
+    const dataContent = Array.isArray(data) ? data[0] : data; 
 
     const pdfContent = {
         content: [
@@ -77,7 +77,7 @@ const pdfMaking = async(pdfName) => {
     }; 
 
     for(let [key, value] of Object.entries(dataContent)) {
-     pdfContent.content.push({text: `{${key}: ${value},}`})   
+     pdfContent.content.push({text: `${key}: ${value},`})   
     }
 
     const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
