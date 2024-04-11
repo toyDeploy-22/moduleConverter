@@ -3,8 +3,8 @@
 import { emptyDir, remove } from "fs-extra";
 // import { pipeline } from "stream/promises";
 // Local:
-import { jsonUpload, pdfCheck, Json2Pdf } from "./Functions/json-2-pdf.js";
-
+import { jsonUpload, jsonCheck, Json2Pdf } from "./Functions/json-2-pdf.js";
+import { pdfUpload, pdfCheck, Pdf2Txt } from "./Functions/pdf-2-txt.js";
 // 3rd Party:
 import cors from "cors";
 import Express from "express";
@@ -17,7 +17,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
   try {
         if(req.file.originalname) {
           console.log(req.body, req.file); 
-        const checker = pdfCheck(req.file); 
+        const checker = jsonCheck(req.file); 
         console.log("JSON checker :" + checker);
 
         switch (checker.code.toString()[0]) {
@@ -140,36 +140,36 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             }
           })
 
-/**
-        csv_convertions.post("/csv-2-js", cors(), csvUpload, async(req, res, next )=>{  
+
+        pdf_convertions.post("/pdf-2-txt", cors(), pdfUpload, async(req, res, next )=>{  
         
           try {
             if(req.file.originalname) {
             console.log(req.body, req.file); 
-            const checker = csvCheck(req.file); 
-            console.log("CSV checker :" + checker);
+            const checker = pdfCheck(req.file); 
+            console.log("PDF checker :" + checker);
     
             switch (checker.code.toString()[0]) {
               case "4": 
               console.error(checker.msg);
               emptyDir(checker.uploadFolder, (err)=>{
-            if(err){
-              console.error("Cannot destroy file uploaded: ", err)
-            } else {
-              console.log("File uploaded destruction OK")
-            }
-            });
+                if(err) {
+                  console.error("No file found to destroy: " + err)
+                } else { 
+                  console.log("File destroyed.")
+                }
+              });
               res.status(checker.code).send(checker.msg); 
               break; 
               case "2":   
-              const newJsFile = await csv2Js();
+              const newTxtFile = await Pdf2Txt();
     // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
-             if(!newJsFile.error) {
-             downloadFile = {...newJsFile};
+             if(!newTxtFile.error) {
+             downloadFile = {...newTxtFile};
             res.status(201).send("file can be downloaded.")
             } else { 
-                if(newJsFile.uploadFolder) {
-                emptyDir(newJsFile.uploadFolder, (err)=>{
+                if(newTxtFile.uploadFolder) {
+                emptyDir(newTxtFile.uploadFolder, (err)=>{
                 if(err){
                   console.error("Cannot destroy file uploaded: ", err)
                 } else {
@@ -177,7 +177,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
                 }
                 })
                 }
-            res.status(500).send(newJsFile.msg || "An error occured. Please try again.")
+            res.status(500).send(newTxtFile.msg || "An error occured. Please try again.")
             }; 
             break;
 
@@ -198,6 +198,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             
             // II) Set response status:
             // res.status(201); 
+            **/
 
             } 
           } else{
@@ -219,7 +220,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
           }
         });
 
-        csv_convertions.get("/csv-2-js/getFile", cors(), csvUpload, async(req, res, next )=>{ 
+        pdf_convertions.get("/csv-2-txt/getFile", cors(), pdfUpload, async(req, res, next )=>{ 
           try {
 
           if(downloadFile.newFileName) {
@@ -239,8 +240,8 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
         })
 
         // IV) Remove file
-        setTimeout(()=>{
-          Promise.all(
+        setTimeout(async()=>{
+          await Promise.all(
           [originalFilePath, filePath].map((file, _ind)=>{ 
             unlink(file, (err)=>{
               if(err){
@@ -269,6 +270,6 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
           }
         })
 
-**/
+
 
       export default pdf_convertions;

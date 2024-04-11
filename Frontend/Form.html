@@ -67,6 +67,8 @@ text-decoration: none;
 <option value="CsvtoJs">From CSV to Javascript</option>
 <option disabled value="">--PDF/JSON--</option>
 <option value="JsontoPdf">From JSON To PDF</option>
+<option disabled value="">--PDF/TXT--</option>
+<option value="PdftoTxt">From PDF to TXT </option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
@@ -111,7 +113,12 @@ url: "csv-2-js"
 id: "JsontoPdf",
 description: "From JSON to PDF",
 url: "json-2-pdf"
-}
+},
+{
+id: "PdftoTxt",
+description: "From PDF to TXT",
+url: "pdf-2-txt"
+}, 
 ];
 let conversion = {status: ""};
 
@@ -126,6 +133,7 @@ case "JsontoJs" :
 case "JstoCsv" : 
 case "CsvtoJs" : 
 case "JsontoPdf":
+case "PdftoTxt":
 conversion = {status: true,
 ...finder
 };

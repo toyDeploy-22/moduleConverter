@@ -5,7 +5,6 @@ import fse from "fs-extra";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import pdfPrinter from "pdfmake";
 import PdfPrinter from "pdfmake";
 
 // destruct/constants/variables
@@ -31,7 +30,7 @@ const jsonUpload = multer({
     storage: jsonStorage,
     }).single("uplFile");
     
-function pdfCheck(file) {
+function jsonCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
     const result = new Object;
@@ -42,7 +41,7 @@ function pdfCheck(file) {
         result.error = true;
         result.code = 401;
         result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"));
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
         result.msg = "Not converted. Please make sure that the file has a json extension."
     } else {
         result.error = false;
@@ -86,7 +85,10 @@ const pdfMaking = async(pdfName) => {
     }
 
     const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
-    pdfDoc.pipe(newPdfDoc); 
+    pdfDoc.pipe(newPdfDoc);
+    pdfDoc.on("error", (err)=>{
+        console.error("An error occured during PDF writing: " + err)
+    }) 
     pdfDoc.end();
     } catch(err) {
         console.error("PDF not created: " + err)
@@ -122,4 +124,4 @@ async function Json2Pdf() {
     }
 } 
 
-export { jsonUpload, pdfCheck, Json2Pdf };
+export { jsonUpload, jsonCheck, Json2Pdf };
