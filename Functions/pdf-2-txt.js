@@ -8,7 +8,7 @@ import multer from "multer";
 import pdfUtil from "pdf-to-text";
 
 // destruct/constants/variables
-const { readJSON, createWriteStream } = fse;
+const { createWriteStream } = fse;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
@@ -53,11 +53,11 @@ function pdfCheck(file) {
 }
 
 const newTxtFile = "New_Convert-" + d.getTime() + ".txt"; 
-const pdfPath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
 const txtPath = join(conversionFolder,"./TXT");
 
 const txtMaking = (newFileName) => {
 
+    const pdfPath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
     const result = new Object();
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
@@ -67,7 +67,7 @@ const txtMaking = (newFileName) => {
         result.msg = err;
         return result
         } else {
-        const newTtxtDoc = createWriteStream(join(txtPath), newFileName);
+        const newTtxtDoc = createWriteStream(join(txtPath, newFileName));
         newTtxtDoc.write(data) //print all text
         newTtxtDoc.on("error", (err)=>{
             result.error = true;
@@ -87,7 +87,6 @@ async function Pdf2Txt() {
     let result ={};
 
     try{
-    
        
     txtMaking(newTxtFile);
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
@@ -95,9 +94,9 @@ async function Pdf2Txt() {
     result.error = false;
     result.code = 201;
     result.newFileName = newTxtFile;
-    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-    result.originalFilePath = pdfPath;
-    result.filePath = join(join(conversionFolder, "./PDF"), newPdfFile);
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
+    result.filePath = join(join(conversionFolder, "./TXT"), newTxtFile);
     result.msg = "PDF file successfully converted to TXT. Ready for download.";
     return result;
 
@@ -105,7 +104,7 @@ async function Pdf2Txt() {
         console.error(err);
         result.error = true;
         result.code = 500;  
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
         result.msg = "The conversion process stopped due to the following issue: " + err.msg;
         return result;

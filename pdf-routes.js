@@ -220,12 +220,12 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
           }
         });
 
-        pdf_convertions.get("/csv-2-txt/getFile", cors(), pdfUpload, async(req, res, next )=>{ 
+        pdf_convertions.get("/pdf-2-txt/getFile", cors(), async(req, res, next )=>{ 
           try {
 
           if(downloadFile.newFileName) {
           
-            let { newFileName, originalFilePath, filePath, msg} = downloadFile; 
+            let { newFileName, originalFilePath, filePath, msg } = downloadFile; 
           
           res.attachment(newFileName)
           res.status(201);
@@ -243,7 +243,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
         setTimeout(async()=>{
           await Promise.all(
           [originalFilePath, filePath].map((file, _ind)=>{ 
-            unlink(file, (err)=>{
+            remove(file, (err)=>{
               if(err){
                 console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
               } else {
@@ -251,7 +251,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
             }
             })
           })
-          )}, 500);
+          )}, 1000);
           downloadFile = {};
         } else {
           res.status(400).send("No file uploaded.")
