@@ -50,24 +50,23 @@ function csvCheck(file) {
     return result;
 }
 
+const jsVify = (str) => {
+    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/;/g, "").replace(/,/g, ""));
+    return strNoComma;
+}
+
 async function csv2Js(){
     
     let result = {};
     
     try {
     const originalFile = await readFile((join(join(conversionFolder,"./UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
-    const csv = [originalFile];
-    const Array2d = csv.filter(Array.isArray).length > 0;
-    const csvContent = []; // for *txt extension, use let csvContent = "" 
-    const newJsName = "New_Convert-" + d.getTime() + ".js";
-
-    if(Array2d) {
-        csvContent.push(csv.map((str)=>str.join()).join(","))
-    } else { 
-        csvContent.push(csv.join(","))
-    }; 
     
-    await writeFile(join(join(conversionFolder, "./JS"), newJsName), csvContent); 
+    const jsBuffer = await jsVify(originalFile);
+
+    const newJsName = "New_Convert-" + d.getTime() + ".js";
+    
+    await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsBuffer); 
    // const newCSV = createWriteStream(join(join(conversionFolder, "./JS"), newJsName)); 
    // newCSV.write()
 

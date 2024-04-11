@@ -5,7 +5,7 @@ import fsp from "fs/promises";
 // Local:
 // 3rd Party:
 import multer from "multer";
-
+import fse from "fs-extra";
 // destruct/constants/variables
 const { readFile, writeFile } = fsp;
 
@@ -51,46 +51,36 @@ function jsCheck(file) {
     return result;
 }
 
-// Array to CSV
-const CSVify = (str) => { 
-
-let csv = []; 
-let pointer = 0; 
-let c = null; 
-let quote = 0; 
-let col = ''; 
-let row = [];
-
-
-while (c = str.charAt(pointer)) {
-    pointer++;
-    if (c == '"') {
-        quote++;
-        // first and even numbered quotes are parsed, not used
-        if (quote == 1 || quote%2 == 0) {
-            continue;
-        }
-    } else if ([',','\r\n','\n','\r'].includes(c)) {
-        // even quotes means a completed col and potential row
-        if (quote%2 == 0) {
-            row.push(col);
-            col = '';
-            quote = 0;
-            // if delimiter is not a comma, also a completed row
-            if (c != ',') {
-                // handle edge case of \r\n being two separate characters
-                if (c == '\r' && str.charAt(pointer) == '\n') {
-                    pointer++;
-                }
-                csv.push(row);
-                row = [];
-            }
-            continue;
+const removeBracket = (wrd)=>{
+    let str = ''; 
+    for(let i = 0; i < wrd.length; i++){
+        if(wrd[i] !== '[' && wrd[i] !== ']') {
+            str += wrd[i]
         }
     }
-    col += c;
+    return str;
 }
-return csv;
+
+const isObject = (buffer) => {
+    if(buffer[0] === '[') { 
+        const newBuffer = removeBracket(buffer);
+        return newBuffer;
+    } else if(typeof buffer === 'object' && buffer !== null && !Array.isArray(buffer)) { 
+        let data = '';
+        for(let [key, val] of Object.entries(buffer)) { 
+            data += `${key}:, ${val}, `
+        }
+        return data;
+    } else {
+        return buffer;
+    }
+}
+
+// Array to CSV
+const CSVify = (str) => {
+    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/,/g, "").replace(/;/g, ""));
+    const strNoSpace = strNoComma.filter((wrd)=>wrd !== "").join();
+     return strNoSpace
 }
 
 async function Js2CSV(){ 
@@ -98,12 +88,13 @@ async function Js2CSV(){
     const result = new Object();
 
     try{
-        const newCsvName = "New_Convert-" + d.getTime() + ".js"; 
-        let content = "";
+        const newCsvName = "New_Convert-" + d.getTime() + ".csv";
     
-        const data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
-        content = `"${ data }"`;
-        const csvBuffer = CSVify(content);
+        const data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"}); 
+
+        const jsBuffer = await isObject(data);
+
+        const csvBuffer = await CSVify(jsBuffer);
         
         await writeFile(join(join(conversionFolder, "./CSV"), newCsvName), csvBuffer); 
         
