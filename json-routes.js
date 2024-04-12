@@ -90,7 +90,7 @@ Json_convertions.post("/js-2-json", cors(), jsUpload, async(req, res, next )=>{
       });
 
 
-      Json_convertions.get("/js-2-json/getFile", cors(), async(req, res, next )=>{ 
+      Json_convertions.get("/js-2-json/getFile", async(req, res, next )=>{ 
         try {
 
         if(downloadFile.newFileName) {
