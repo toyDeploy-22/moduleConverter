@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 // 3rd Party:
 import multer from "multer";
 import fse from "fs-extra";
-import e from "express";
 import { createWriteStream } from "fs";
 // destruct/constants/variables
 // const { readFile, writeFile } = fsp;
@@ -57,7 +56,7 @@ function jsonCheck(file) {
 const oneLineObject = (obj)=>{ 
     let wrd = '';
     for(let [key, val] of Object.entries(obj)) { 
-        wrd += `${key}, ${val},`;
+        wrd += `${key}, ${JSON.stringify(val)},`;
     }
     return wrd.slice(0, Number(wrd.length - 1)) // removes last comma
 }
@@ -88,7 +87,7 @@ const isObject = (buffer) => {
 // Array to CSV
 const CSVify = (str) => {
     const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/,/g, "").replace(/;/g, ""));
-    const strNoSpace = strNoComma.filter((wrd)=>wrd !== "").join();
+    const strNoSpace = strNoComma.filter((wrd)=>wrd !== "").join(",");
      return strNoSpace
 }
 
@@ -112,7 +111,7 @@ async function Json2CSV(){
         result.code = 201;
         result.newFileName = newCsvName;
         result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
         result.filePath = join(join(conversionFolder, "./CSV"), newCsvName);
         result.msg = "JS file successfully converted to CSV. Ready for download.";
         return result;

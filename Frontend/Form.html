@@ -1,5 +1,11 @@
 <!doctype html>
 <html>
+<!-- 
+missing convertions:
+csv to json
+json to txt
+javascript to txt
+-->
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
@@ -59,23 +65,24 @@ text-decoration: none;
 <label for="fileSelection"></label>
 <select id="fileSelection">
 <option value="">Select here</option>
-<option disabled value="">--JAVASCRIPT/JSON--</option>
+<option disabled value="">-- convert JAVASCRIPT --</option>
 <option value="JstoJson">From Javascript to JSON</option>
-<option value="JsontoJs">From JSON to Javascript</option>
-<option disabled value="">--JAVASCRIPT/CSV--</option>
 <option value="JstoCsv">From Javascript to CSV</option>
+<option disabled value="">-- convert CSV --</option>
 <option value="CsvtoJs">From CSV to Javascript</option>
-<option disabled value="">--PDF/JSON--</option>
-<option value="JsontoPdf">From JSON To PDF</option>
-<option disabled value="">--PDF/TXT--</option>
+<option disabled value="">--convert PDF--</option>
 <option value="PdftoTxt">From PDF to TXT </option>
+<option disabled value="">--convert JSON--</option>
+<option value="JsontoJs">From JSON to Javascript</option>
+<option value="JsontoPdf">From JSON To PDF</option>
+<option value="JsontoCsv">From JSON to CSV</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
   <button type="submit">Done</button>
 <p id="yourSelection" class="notShow"></p> 
 <p class="notShow" value="ok" >Sucess!</p>
-<p class="notShow" value="nok" >Failed!</p>
+<p class="notShow" value="nok" ></p>
 <p class="waiting" class="notShow"></p>
 <a id="fileLink" class="notShow">You can get your file here!</a>
 </form>
@@ -118,7 +125,12 @@ url: "json-2-pdf"
 id: "PdftoTxt",
 description: "From PDF to TXT",
 url: "pdf-2-txt"
-}, 
+},
+{
+id: "JsontoCsv",
+description: "From JSON to CSV",
+url: "json-2-csv"
+} 
 ];
 let conversion = {status: ""};
 
@@ -129,7 +141,8 @@ function getUrl(ext) {
 const finder = urls.filter((url)=>url.id === ext)[0]; 
 switch (finder.id){
 case "JstoJson": 
-case "JsontoJs" :
+case "JsontoJs":
+case "JsontoCsv":
 case "JstoCsv" : 
 case "CsvtoJs" : 
 case "JsontoPdf":
@@ -194,7 +207,7 @@ if(Resp.ok) {
 waitEvent = false;
 waitingMsg.classList.add("notShow");
 console.log("sent");
-console.log(Resp)
+// console.log(Resp)
 success.setAttribute("class", "show");
 downloadLink.classList.remove("notShow");
 downloadLink.setAttribute("download", "");
@@ -203,9 +216,18 @@ downloadLink.setAttribute("target", "_blank");
 	} else {
 	waitEvent = false;
 	waitingMsg.classList.add("notShow");
-	const msg = "An error occured during the process. Make sure that the syntax of your file is correct."
-	console.error(msg);
-failure.setAttribute("class", "show");
+	console.error(Resp);
+	const failure_title = Resp.statusText || "Failed";
+	let msg = '';
+	switch(Resp.status.toString()) {
+	case "401":
+	msg = ": Make sure that you have selected the correct file extension.";
+	break;
+	default:
+	msg = ": An error occured during the process. Make sure that the syntax of your file is correct."
+	}
+	failure.setAttribute("class", "show");
+	failure.innerHTML = failure_title + msg
 	}} else {
 waitEvent = false;
 waitingMsg.classList.add("notShow");	

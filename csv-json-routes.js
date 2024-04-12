@@ -11,7 +11,7 @@ import Express from "express";
 const Json_csv_conv = Express.Router();
 let downloadFile = {};
 
-Json_csv_conv.post("/csv-2-json", cors(), jsonUpload, async(req, res, next )=>{ 
+Json_csv_conv.post("/json-2-csv", cors(), jsonUpload, async(req, res, next )=>{ 
   
   try {
     if(req.file.originalname) {
@@ -29,7 +29,7 @@ Json_csv_conv.post("/csv-2-json", cors(), jsonUpload, async(req, res, next )=>{
               console.log("File destroyed.")
             }
           });
-          res.status(checker.code).send(checker.msg); 
+          res.status(checker.code).send(checker); 
           break; 
           case "2":   
           const newJsonFile = await Json2CSV();
@@ -89,7 +89,7 @@ Json_csv_conv.post("/csv-2-json", cors(), jsonUpload, async(req, res, next )=>{
       });
 
 
-      Json_csv_conv.get("/csv-2-json/getFile", async(req, res, next )=>{ 
+      Json_csv_conv.get("/json-2-csv/getFile", async(req, res, next )=>{ 
         try {
 
         if(downloadFile.newFileName) {
