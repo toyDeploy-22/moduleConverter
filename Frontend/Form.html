@@ -76,6 +76,8 @@ text-decoration: none;
 <option value="JsontoJs">From JSON to Javascript</option>
 <option value="JsontoPdf">From JSON To PDF</option>
 <option value="JsontoCsv">From JSON to CSV</option>
+<option disabled value="">--convert TXT--</option>
+<option value="TxttoJson">From TXT to JSON</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
@@ -130,6 +132,11 @@ url: "pdf-2-txt"
 id: "JsontoCsv",
 description: "From JSON to CSV",
 url: "json-2-csv"
+},
+{
+id: "TxttoJson",
+description: "From TXT to JSON",
+url: "txt-2-json"
 } 
 ];
 let conversion = {status: ""};
@@ -138,23 +145,17 @@ const downloadLink = document.getElementById("fileLink");
 
 
 function getUrl(ext) {
-const finder = urls.filter((url)=>url.id === ext)[0]; 
-switch (finder.id){
-case "JstoJson": 
-case "JsontoJs":
-case "JsontoCsv":
-case "JstoCsv" : 
-case "CsvtoJs" : 
-case "JsontoPdf":
-case "PdftoTxt":
+const finder = urls.filter((url)=>url.id === ext); 
+
+if(finder.length > 0) { 
+const options = finder[0];
 conversion = {status: true,
-...finder
-};
-break;
-default:
+...options
+	}
+} else {
 conversion = {status: false,
 url: ""
-	}
+ }
 	}
 }
 

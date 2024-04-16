@@ -40,13 +40,13 @@ function pdfCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
         result.msg = "Not converted. Please make sure that the file has a pdf extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.msg = "File authorized."
     }
     return result;

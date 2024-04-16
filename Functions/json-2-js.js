@@ -39,13 +39,13 @@ function jsonCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"));
         result.msg = "Not converted. Please make sure that the file has a json extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -91,7 +91,7 @@ async function Json2Js() {
     result.error = false;
     result.code = 201;
     result.newFileName = newJsName;
-    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
     result.filePath = join(join(conversionFolder, "./JS"), newJsName);
     result.msg = "JSON file successfully converted to JS. Ready for download.";
@@ -100,7 +100,7 @@ async function Json2Js() {
         console.error(err);
         result.error = true;
         result.code = 500;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
         result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;

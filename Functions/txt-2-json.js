@@ -2,17 +2,19 @@
 import  { dirname, join, extname } from "path";
 import { fileURLToPath } from "url";
 import fsp from "fs/promises";
+import fs from "fs";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import fse from "fs-extra";
+// import fse from "fs-extra";
 
 // destruct/constants/variables
-const { readFile, writeFile } = fsp;
+const { readFile } = fsp;
+const { createWriteStream } = fs;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
 const d = new Date;
-let newJsonFile;
+let newTxtFile;
 
 const txtStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -35,18 +37,18 @@ function txtCheck(file) {
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
     const result = new Object;
     const checkFormat = extensionFormat === '.txt' || 
-    authorizedFormat.filter((fmt)=>fmt.toLowerCase() === "text").length > 0;
+    authorizedFormat[0] === "text" && authorizedFormat[1] === "plain";
 
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
         result.msg = "Not converted. Please make sure that the file has a txt extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -60,18 +62,32 @@ async function txt2Json() {
     const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
     
 // await readFile(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"});
-    const txtBuffer = (await readFile(join(join(conversionFolder,"./UPLOAD"), newTxFile))).toString().join(","); 
+    const txtBuffer = (await readFile(join(join(conversionFolder,"./UPLOAD"), newTxtFile), { encoding: 'utf-8'})); 
 
     // const jsonBuffer = await JSON.parse(content);
 
     // await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
 
     const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName));
-    const arr = txtBuffer.split(","); 
-    const comma = ","
+    const preArr = txtBuffer.replace(/:/g, ",");
+    console.log('preArr:' + preArr)
+    const arr = preArr.split(",");
+    console.log('arr:' + arr) 
+    
+    const endOfLine=(val, arr)=>{
+        const comma = ",";
+        let end;
+
+        if(arr.indexOf(val) !== (arr.length + 1)){ 
+            return comma; 
+        } else { 
+            end = "true"; 
+    }
+} 
+
 
     newContent.write("[{"); 
-    arr.map((extr, _ind)=>newContent.write(`${extr}: ${extr[_ind + 1]?(extr[_ind + 1].toString(), comma) : ""}`))     
+    arr.map((extr, _ind, _arr)=>newContent.write(`"${extr}": "${extr[_ind + 1]? extr[_ind + 1].toString() : ""}"${endOfLine(extr, _arr)}`))     
     newContent.write("}]");
     newContent.on("error", (err)=>{
         console.error("TXT Writing error conversion to JSON: " + err)
@@ -80,8 +96,8 @@ async function txt2Json() {
     result.error = false;
     result.code = 201;
     result.newFileName = newJsonName;
-    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
     result.filePath = join(join(conversionFolder, "./JSON"), newJsonName);
     result.msg = "TXT file successfully converted to JSON. Ready for download.";
     return result;
@@ -89,8 +105,8 @@ async function txt2Json() {
         console.error(err);
         result.error = true;
         result.code = 500;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
         result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;
     }

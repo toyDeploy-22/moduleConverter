@@ -42,12 +42,12 @@ function jsonCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.msg = "Not converted. Please make sure that the file has a json extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -110,7 +110,7 @@ async function Json2CSV(){
         result.error = false;
         result.code = 201;
         result.newFileName = newCsvName;
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
         result.filePath = join(join(conversionFolder, "./CSV"), newCsvName);
         result.msg = "JS file successfully converted to CSV. Ready for download.";
@@ -120,7 +120,7 @@ async function Json2CSV(){
     console.error(err);
     result.error = true;
     result.code = err.code || 500;
-    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
     result.msg = err.message || "JS to CSV conversion stopped: " + err;
     return result;
