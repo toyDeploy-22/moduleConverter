@@ -69,25 +69,29 @@ async function txt2Json() {
     // await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
 
     const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName));
-    const preArr = txtBuffer.replace(/:/g, ",");
-    console.log('preArr:' + preArr)
-    const arr = preArr.split(",");
-    console.log('arr:' + arr) 
+    const preArr = txtBuffer.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, ''); 
+    // all special characters to remove
     
-    const endOfLine=(val, arr)=>{
-        const comma = ",";
-        let end;
+    const splittedArr = preArr.split(" "); 
+    
+    const propVal=(arr, newStream)=>{
+        let i = 0;
+        const newArr = arr.length; 
+        let mapArr = arr.map((elem)=>elem); 
 
-        if(arr.indexOf(val) !== (arr.length + 1)){ 
-            return comma; 
-        } else { 
-            end = "true"; 
+        for(i; i < newArr; i++){
+            if(mapArr.length > 2) {
+                newStream.write(`"${mapArr.splice(0, 1)[0]}": "${mapArr.splice(0,1)[0]}",\n`);
+            } else {
+                newStream.write(`"${mapArr.splice(0, 1)[0]}": "${mapArr.splice(0,1)[0] || ""}"`);
+                break;
+            }
+        }
     }
-} 
 
 
     newContent.write("[{"); 
-    arr.map((extr, _ind, _arr)=>newContent.write(`"${extr}": "${extr[_ind + 1]? extr[_ind + 1].toString() : ""}"${endOfLine(extr, _arr)}`))     
+    propVal(splittedArr, newContent);    
     newContent.write("}]");
     newContent.on("error", (err)=>{
         console.error("TXT Writing error conversion to JSON: " + err)

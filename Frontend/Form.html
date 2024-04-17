@@ -161,6 +161,11 @@ url: ""
 
 function urlSelected(){
 getUrl(format.value);
+failure.setAttribute("class", "notShow");
+success.setAttribute("class", "notShow");
+downloadLink.setAttribute("class", "notShow");
+downloadLink.setAttribute("download", "");
+downloadLink.setAttribute("href", "");
 
 if(!conversion.status){
 userSelection.setAttribute("class", "notSelected");
