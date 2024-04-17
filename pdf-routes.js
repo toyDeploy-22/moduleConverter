@@ -39,8 +39,8 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
           downloadFile = {...newPdfFile};
           res.status(201).send("file can be downloaded.")
           } else { 
-            if(newJsonFile.uploadFolder) {
-              emptyDir(err.uploadFolder, (err)=>{
+            if(newPdfFile.uploadFolder) {
+              emptyDir(newPdfFile.uploadFolder, (err)=>{
               if(err){
                 console.error("Cannot destroy file uploaded: ", err)
               } else {
@@ -48,7 +48,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
               }
               })
               }
-          res.status(500).send(newCsvFile.msg || "An error occured. Please try again.")
+          res.status(500).send(newPdfFile.msg || "An error occured. Please try again.")
           }; 
           break;
 
@@ -90,7 +90,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
 
 
 
-          pdf_convertions.get("/json-2-pdf/getFile", cors(), jsonUpload, async(req, res, next )=>{ 
+          pdf_convertions.get("/json-2-pdf/getFile", cors(), async(req, res, next )=>{ 
             try {
   
             if(downloadFile.newFileName) {

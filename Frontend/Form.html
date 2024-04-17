@@ -78,6 +78,7 @@ text-decoration: none;
 <option value="JsontoCsv">From JSON to CSV</option>
 <option disabled value="">--convert TXT--</option>
 <option value="TxttoJson">From TXT to JSON</option>
+<option value="TxttoPdf">From TXT to PDF</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
@@ -89,6 +90,7 @@ text-decoration: none;
 <a id="fileLink" class="notShow">You can get your file here!</a>
 </form>
 <script>
+
 const form = document.getElementsByTagName("form")[0];
 const userSelection = document.getElementsByTagName("p")[1];
 const success = document.getElementsByTagName("p")[2];
@@ -137,6 +139,11 @@ url: "json-2-csv"
 id: "TxttoJson",
 description: "From TXT to JSON",
 url: "txt-2-json"
+},
+{
+id: "TxttoPdf",
+description: "From TXT to PDF",
+url: "txt-2-pdf"
 } 
 ];
 let conversion = {status: ""};
