@@ -6,6 +6,7 @@ import pdf_convertions from "./pdf-routes.js";
 import Json_csv_conv from "./csv-json-routes.js";
 import txt_json_conv from "./txt-json-routes.js";
 import txt_pdf_conv from "./txt-pdf-routes.js";
+import csv_txt_conv from './csv-txt-routes.js';
 import sendError from "./Functions/errorEvents.js";
 // 3rd Party:
 import Express from "express";
@@ -23,6 +24,7 @@ myServer.use("/convert", pdf_convertions);
 myServer.use("/convert", Json_csv_conv);
 myServer.use("/convert", txt_json_conv);
 myServer.use("/convert", txt_pdf_conv);
+myServer.use("/convert", csv_txt_conv);
 myServer.use(sendError);
 // server
 myServer.listen(myPort, ()=>{

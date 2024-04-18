@@ -70,6 +70,7 @@ text-decoration: none;
 <option value="JstoCsv">From Javascript to CSV</option>
 <option disabled value="">-- convert CSV --</option>
 <option value="CsvtoJs">From CSV to Javascript</option>
+<option value="CsvtoTxt">From CSV to TXT</option>
 <option disabled value="">--convert PDF--</option>
 <option value="PdftoTxt">From PDF to TXT </option>
 <option disabled value="">--convert JSON--</option>
@@ -144,6 +145,11 @@ url: "txt-2-json"
 id: "TxttoPdf",
 description: "From TXT to PDF",
 url: "txt-2-pdf"
+},
+{
+id: "CsvtoTxt",
+description: "From CSV to TXT",
+url: "csv-2-txt"
 } 
 ];
 let conversion = {status: ""};
