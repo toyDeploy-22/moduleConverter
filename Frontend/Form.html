@@ -80,6 +80,7 @@ text-decoration: none;
 <option disabled value="">--convert TXT--</option>
 <option value="TxttoJson">From TXT to JSON</option>
 <option value="TxttoPdf">From TXT to PDF</option>
+<option value="TxttoCsv">From TXT to CSV</option>
 </select>
   <input type="file" name="uplFile" />
   <br /><br />
@@ -150,6 +151,11 @@ url: "txt-2-pdf"
 id: "CsvtoTxt",
 description: "From CSV to TXT",
 url: "csv-2-txt"
+},
+{
+id: "TxttoCsv",
+description: "From TXT to CSV",
+url: "txt-2-csv"
 } 
 ];
 let conversion = {status: ""};

@@ -77,7 +77,7 @@ async function Csv2Txt(){
     result.error = true;
     result.code = err.code || 500;
     result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
+    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
     result.msg = err.message || "CSV to TXT conversion stopped: " + err;
     return result;
     }

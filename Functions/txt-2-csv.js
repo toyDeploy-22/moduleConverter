@@ -21,11 +21,11 @@ const txtStorage = multer.diskStorage({
       const txtName = `New_Txt-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
       newTxtFile = txtName + ExtName;
-      cb(null, newCsvFile)
+      cb(null, newTxtFile)
     }
 });
 
-const csvUpload = multer({
+const txtUpload = multer({
     storage: txtStorage,
     }).single("uplFile");
 
@@ -50,34 +50,43 @@ function txtCheck(file) {
     return result;
 }
 
+const contentToCsv = (content) => {
+    const arrContent = content.split(",").map((wrd)=>wrd.replace(/,/g, ""));
+
+    const csvContent = arrContent.map((str, _ind, arr)=>(arr.indexOf(str) + 1)/2 !== 0 && arr.indexOf(str) !== 1 ? (str + ",\n") : (str + ",")).join("");
+    
+    return csvContent;
+}
+
 async function txt2Csv(){
     
     let result = {};
     
     try {
-    const csv = await readFile((join(join(conversionFolder,"./UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
-    const Array2d = await csv.filter(Array.isArray).length > 0;
-    const csvContent = []; // for *txt extension, use let csvContent = "" 
-    const newJsName = "New_Convert-" + d.getTime() + ".js";
-
-    if(Array2d) {
-        csvContent.push(csv.map((str)=>str.join() + "\n").join(","))
-    } else { 
-        csvContent.map((str, _ind, arr)=>(arr.indexOf(str) + 1)/2 !== 0 && arr.indexOf(str) !== 1 ? (str + ",\n") : (str + ",")).join("")
-    }; 
+        const newCsvName = "New_Convert-" + d.getTime() + ".csv";
     
-    writeFile()
+        const csv = await readFile(join(join(conversionFolder,"./UPLOAD"), newTxtFile), { encoding: 'utf-8'}); 
+
+        const text = await contentToCsv(csv);
+    
+        await writeFile(join(join(conversionFolder, "./CSV"), newCsvName), text);
 
     result.error = false;
     result.code = 201;
-    result.newFileName = newJsName;
-    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.filePath = join(join(conversionFolder, "./JS"), newJsName);
-    result.msg = "CSV file successfully converted to JS. Ready for download.";
+    result.newFileName = newCsvName;
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
+    result.filePath = join(join(conversionFolder, "./CSV"), newCsvName);
+    result.msg = "TXT file successfully converted to CSV. Ready for download.";
     return result;
-} catch(err) {
-
+} catch(err) { 
+    console.error(err);
+    result.error = true;
+    result.code = err.code || 500;
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
+    result.msg = err.message || "TXT to CSV conversion stopped: " + err;
+    return result;
     }
 }
-export {};
+export { txtUpload, txtCheck, txt2Csv };
