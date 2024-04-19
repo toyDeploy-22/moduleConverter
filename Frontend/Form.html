@@ -208,6 +208,11 @@ userSelection.appendChild(boldElem);
 format.addEventListener("change", urlSelected)
 
 async function sendFile(){
+failure.setAttribute("class", "notShow");
+success.setAttribute("class", "notShow");
+downloadLink.setAttribute("class", "notShow");
+downloadLink.setAttribute("download", "");
+downloadLink.setAttribute("href", "");
 try{
 if(conversion.status) { 
 const url = `http://localhost:5000/convert/${conversion.url}`;

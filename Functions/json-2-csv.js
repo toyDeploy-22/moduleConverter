@@ -70,23 +70,23 @@ const isObject = (buffer) => {
         newBuffer = oneLineObject(buffer);
         return newBuffer;
     } else { 
-        const result = {
+        const err = {
         error: true,
         code: 401,
-        msg: "Conversion stopped: Your file should be an array containing an json Object or just a json Object.",
+        msg: "Conversion stopped: Your file should be an array containing a json Object or just a json Object.",
         }
         newBuffer = false;
-        const err = new Error;
-        err.code = result.code;
-        err.name = "JSON Syntax Error";
-        err.message = result.msg;
-        throw err;
+        const result = new Error;
+        result.code = err.code;
+        result.name = "JSON Syntax Error";
+        result.message = err.msg;
+        throw result;
     }
 }
 
 // Array to CSV
 const CSVify = (str) => {
-    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/,/g, "").replace(/;/g, ""));
+    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, ' '));
     const strNoSpace = strNoComma.filter((wrd)=>wrd !== "").join(",");
      return strNoSpace
 }
