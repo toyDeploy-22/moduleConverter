@@ -62,18 +62,32 @@ async function Js2Json() {
     
     let data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"});
 
-    let content = '';
+    const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName));
 
-    typeof data === 'object' && variable !== null && !Array.isArray(data) ? content = JSON.stringify(data) : content = JSON.stringify({data: data});
+    const preArr = data.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, ''); 
+    // all special characters to remove
+    
+    const splittedArr = preArr.split(" "); 
+
+    const propVal=(arr, newStream)=>{
+        let i = 0;
+        const newArr = arr.length; 
+        let mapArr = arr.map((elem)=>elem).filter((wrd)=>wrd !== ""); 
+
+        for(i; i < newArr; i++){
+            if(mapArr.length > 2) {
+                newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0])},\n`);
+            } else {
+                newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0]) || ""}`);
+                break;
+            }
+        }
+    }
     
     // const jsonBuffer = JSON.stringify(content);
-  
-    const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName), {
-        encoding: 'ascii'
-    });
     
     newContent.write("[");
-    newContent.write(content);
+    propVal(splittedArr, newContent);
     newContent.write("]")
     newContent.on("error", (err)=>{console.error("Oooopsie: " + err)})
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
@@ -82,7 +96,7 @@ async function Js2Json() {
     result.error = false;
     result.code = 201;
     result.newFileName = newJsonName;
-    result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+    result.uploadFolder = join(conversionFolder,"./UPLOAD");
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
     result.filePath = join(join(conversionFolder, "./JSON"), newJsonName);
     result.msg = "JS file successfully converted to JSON. Ready for download.";
@@ -92,7 +106,7 @@ async function Js2Json() {
         console.error(err);
         result.error = true;
         result.code = 500;  
-        result.uploadFolder = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
         result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;

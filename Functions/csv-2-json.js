@@ -77,13 +77,13 @@ async function csv2Json() {
     const propVal=(arr, newStream)=>{
         let i = 0;
         const newArr = arr.length; 
-        let mapArr = arr.map((elem)=>elem); 
+        let mapArr = arr.map((elem)=>elem).filter((wrd)=>wrd !== ""); 
 
         for(i; i < newArr; i++){
             if(mapArr.length > 2) {
                 newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0])},\n`);
             } else {
-                newStream.write(`"${mapArr.splice(0, 1)[0]}": "${mapArr.splice(0,1)[0] || ""}"`);
+                newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0]) || ""}`);
                 break;
             }
         }

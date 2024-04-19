@@ -86,7 +86,7 @@ const isObject = (buffer) => {
 
 // Array to CSV
 const CSVify = (str) => {
-    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, ' '));
+    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/[&\/\\,.'"{}]/g, ' '));
     const strNoSpace = strNoComma.filter((wrd)=>wrd !== "").join(",");
      return strNoSpace
 }
