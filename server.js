@@ -11,6 +11,7 @@ import txt_csv_conv from './txt-csv-routes.js';
 import Csv_json_conv from './csv-json-routes.js';
 import Js_Txt_conv from './js-txt-routes.js';
 import csv_pdf_conv from './csv-pdf-routes.js';
+import pdf_csv_conv from './pdf-csv-routes.js';
 import sendError from "./Functions/errorEvents.js";
 // 3rd Party:
 import Express from "express";
@@ -30,7 +31,8 @@ const convertions = [
     pdf_convertions, 
     txt_json_conv,
     txt_pdf_conv,
-    txt_csv_conv
+    txt_csv_conv,
+    pdf_csv_conv
 ]
 // middlewares
 myServer.use(Express.json());

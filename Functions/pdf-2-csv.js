@@ -56,11 +56,9 @@ const newCsvFile = "New_Convert-" + d.getTime() + ".csv";
 const csvPath = join(conversionFolder,"./CSV");
 
 const contentToCsv = (content) => {
-    const arrContent = content.split(",").map((wrd)=>wrd.replace(/,/g, ""));
-
-    const csvContent = arrContent.map((str, _ind, arr)=>(arr.indexOf(str) + 1)/2 !== 0 && arr.indexOf(str) !== 1 ? (str + ",\n") : (str + ",")).join("");
+    const csvContent = content.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '').split(" ");
     
-    return csvContent;
+    return csvContent.join(",");
 }
 
 const csvMaking = (newFileName) => {
@@ -76,7 +74,10 @@ const csvMaking = (newFileName) => {
         return result
         } else {
         const newCsvDoc = createWriteStream(join(csvPath, newFileName));
-        newCsvDoc.write(contentToCsv(data)) //print all text
+        const newData = contentToCsv(data);
+        console.log(newData)
+        setTimeout(()=>{ 
+        newCsvDoc.write(newData) //print all text
         newCsvDoc.on("error", (err)=>{
             result.error = true;
             result.msg = err;
@@ -84,7 +85,7 @@ const csvMaking = (newFileName) => {
             return result;
         });
         newCsvDoc.end();
-        }    
+        }, 800)}    
     });
     
     
