@@ -9,6 +9,8 @@ import txt_pdf_conv from "./txt-pdf-routes.js";
 import csv_txt_conv from './csv-txt-routes.js';
 import txt_csv_conv from './txt-csv-routes.js';
 import Csv_json_conv from './csv-json-routes.js';
+import Js_Txt_conv from './js-txt-routes.js';
+import csv_pdf_conv from './csv-pdf-routes.js';
 import sendError from "./Functions/errorEvents.js";
 // 3rd Party:
 import Express from "express";
@@ -17,18 +19,23 @@ import Express from "express";
 const { MY_PORT } = process.env;
 const myServer = Express();
 const myPort = MY_PORT || 5000;
-
+const convertions = [
+    Js_Txt_conv,
+    Json_convertions,
+    Json_csv_conv,
+    csv_convertions,
+    Csv_json_conv , 
+    csv_txt_conv,
+    csv_pdf_conv,
+    pdf_convertions, 
+    txt_json_conv,
+    txt_pdf_conv,
+    txt_csv_conv
+]
 // middlewares
 myServer.use(Express.json());
-myServer.use("/convert", Json_convertions);
-myServer.use("/convert", csv_convertions);
-myServer.use("/convert", pdf_convertions);
-myServer.use("/convert", Json_csv_conv);
-myServer.use("/convert", txt_json_conv);
-myServer.use("/convert", txt_pdf_conv);
-myServer.use("/convert", csv_txt_conv);
-myServer.use("/convert", txt_csv_conv);
-myServer.use("/convert", Csv_json_conv);
+convertions.forEach((convert)=>myServer.use("/convert", convert))
+
 myServer.use(sendError);
 // server
 myServer.listen(myPort, ()=>{

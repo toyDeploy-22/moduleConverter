@@ -68,10 +68,12 @@ text-decoration: none;
 <option disabled value="">-- convert JAVASCRIPT --</option>
 <option value="JstoJson">From Javascript to JSON</option>
 <option value="JstoCsv">From Javascript to CSV</option>
+<option value="JstoTxt">From Javascript to TXT</option>
 <option disabled value="">-- convert CSV --</option>
 <option value="CsvtoJs">From CSV to Javascript</option>
 <option value="CsvtoJson">From CSV to JSON</option>
 <option value="CsvtoTxt">From CSV to TXT</option>
+<option value="CsvtoPdf">From CSV to PDF</option>
 <option disabled value="">--convert PDF--</option>
 <option value="PdftoTxt">From PDF to TXT </option>
 <option disabled value="">--convert JSON--</option>
@@ -119,9 +121,19 @@ description: "From Javascript to CSV",
 url: "js-2-csv"
 },
 {
+id: "JstoTxt",
+description: "From Javascript to TXT",
+url: "js-2-txt"
+}, 
+{
 id: "CsvtoJs",
 description: "From CSV to Javascript",
 url: "csv-2-js"
+},
+{
+id: "CsvtoPdf",
+description: "From CSV to PDF",
+url: "csv-2-pdf"
 },
 {
 id: "JsontoPdf",
@@ -162,7 +174,7 @@ url: "txt-2-csv"
 id: "CsvtoJson",
 description: "From CSV to JSON",
 url: "csv-2-json"
-} 
+}
 ];
 let conversion = {status: ""};
 

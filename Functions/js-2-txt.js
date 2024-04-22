@@ -51,60 +51,24 @@ function jsCheck(file) {
     return result;
 }
 
-const removeBracket = (wrd)=>{
-    let str = ''; 
-    for(let i = 0; i < wrd.length; i++){
-        if(wrd[i] !== '[' && wrd[i] !== ']') {
-            str += wrd[i]
-        }
-    }
-    return str;
-}
-
-const isObject = (buffer) => {
-    if(buffer[0] === '[') { 
-        const newBuffer = removeBracket(buffer);
-        return newBuffer;
-    } else if(typeof buffer === 'object' && buffer !== null && !Array.isArray(buffer)) { 
-        let data = '';
-        for(let [key, val] of Object.entries(buffer)) { 
-            data += `${key}:, ${val}, `
-        }
-        return data;
-    } else {
-        return buffer;
-    }
-}
-
-// Array to CSV
-const CSVify = (str) => {
-    const strNoComma = str.split(" ").map((wrd)=>wrd.replace(/,/g, "").replace(/;/g, ""));
-    const strNoSpace = strNoComma.filter((wrd)=>wrd !== "").join();
-     return strNoSpace
-}
-
-async function Js2CSV(){ 
+async function Js2Txt(){ 
     
     const result = new Object();
 
     try{
-        const newCsvName = "New_Convert-" + d.getTime() + ".csv";
+        const newTxtName = "New_Convert-" + d.getTime() + ".txt";
     
-        const data = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"}); 
-
-        const jsBuffer = await isObject(data);
-
-        const csvBuffer = await CSVify(jsBuffer);
-        
-        await writeFile(join(join(conversionFolder, "./CSV"), newCsvName), csvBuffer); 
+        const jsBuffer = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"}); 
+    
+        await writeFile(join(join(conversionFolder, "./TXT"), newTxtName), jsBuffer); 
         
         result.error = false;
         result.code = 201;
-        result.newFileName = newCsvName;
+        result.newFileName = newTxtName;
         result.uploadFolder = join(conversionFolder,"./UPLOAD");
         result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-        result.filePath = join(join(conversionFolder, "./CSV"), newCsvName);
-        result.msg = "JS file successfully converted to CSV. Ready for download.";
+        result.filePath = join(join(conversionFolder, "./TXT"), newTxtName);
+        result.msg = "JS file successfully converted to TXT. Ready for download.";
         return result;
   } catch(err) { 
     
@@ -113,11 +77,11 @@ async function Js2CSV(){
     result.code = 500;
     result.uploadFolder = join(conversionFolder,"./UPLOAD");
     result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-    result.msg = "JS to CSV conversion stopped: " + err;
+    result.msg = "JS to TXT conversion stopped: " + err;
     return result;
 
   }
 
 }
 
-export { jsUpload, jsCheck, Js2CSV }
+export { jsUpload, jsCheck, Js2Txt }

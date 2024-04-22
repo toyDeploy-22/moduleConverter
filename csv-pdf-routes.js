@@ -1,28 +1,27 @@
 // Core:
-//import { unlink } from "fs";
+// import { unlink } from "fs";
 import { emptyDir, remove } from "fs-extra";
 // import { pipeline } from "stream/promises";
 // Local:
-import { csvUpload, csvCheck, Csv2Txt } from "./Functions/csv-2-txt.js";
-
+import { csvUpload, csvCheck, Csv2Pdf } from "./Functions/csv-2-pdf.js";
 // 3rd Party:
 import cors from "cors";
 import Express from "express";
 // destruct/constants/variables
-const csv_txt_conv = Express.Router();
+const csv_pdf_conv = Express.Router();
 let downloadFile = {};
 
-csv_txt_conv.post("/csv-2-txt", cors(), csvUpload, async(req, res, next )=>{ 
+csv_pdf_conv.post("/csv-2-pdf", cors(), csvUpload, async(req, res, next )=>{ 
  
   try {
         if(req.file.originalname) {
-        console.log(req.body, req.file); 
+          console.log(req.body, req.file); 
         const checker = csvCheck(req.file); 
         console.log("CSV checker :" + checker);
 
         switch (checker.code.toString()[0]) {
           case "4": 
-          console.error(checker.msg); 
+          console.error(checker.msg);
           emptyDir(checker.uploadFolder, (err)=>{
             if(err) {
               console.error("No file found to destroy: " + err)
@@ -33,20 +32,22 @@ csv_txt_conv.post("/csv-2-txt", cors(), csvUpload, async(req, res, next )=>{
           res.status(checker.code).send(checker.msg); 
           break; 
           case "2":   
-          const newCsvFile = await Csv2Txt();
+          const newPdfFile = await Csv2Pdf();
 // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
-        if(!newCsvFile.error) {  
-          downloadFile = { ...newCsvFile };
+        if(!newPdfFile.error) {  
+          downloadFile = { ...newPdfFile };
           res.status(201).send("file can be downloaded.")
           } else { 
-            emptyDir(newCsvFile.uploadFolder, (err)=>{
-              if(err) {
-                console.error("No file found to destroy: " + err)
-              } else { 
-                console.log("File destroyed.")
+            if(newPdfFile.uploadFolder) {
+              emptyDir(newPdfFile.uploadFolder, (err)=>{
+              if(err){
+                console.error("Cannot destroy file uploaded: ", err)
+              } else {
+                console.log("File uploaded destruction OK")
               }
-            });
-          res.status(500).send(newCsvFile.msg || "An error occured. Please try again.")
+              })
+              }
+          res.status(500).send(newPdfFile.msg || "An error occured. Please try again.")
           }; 
           break;
 
@@ -81,14 +82,14 @@ csv_txt_conv.post("/csv-2-txt", cors(), csvUpload, async(req, res, next )=>{
                   console.log("File uploaded destruction OK")
                 }
                 })
-                }
+              }
               res.status(500).send( err.msg || msg_2 )
             }
           });
 
 
 
-          csv_txt_conv.get("/csv-2-txt/getFile", async(req, res, next )=>{ 
+          csv_pdf_conv.get("/csv-2-pdf/getFile", cors(), async(req, res, next )=>{ 
             try {
   
             if(downloadFile.newFileName) {
@@ -138,4 +139,4 @@ csv_txt_conv.post("/csv-2-txt", cors(), csvUpload, async(req, res, next )=>{
             }
           })
 
-export default csv_txt_conv;
+          export default csv_pdf_conv;

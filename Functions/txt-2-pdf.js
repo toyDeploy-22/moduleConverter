@@ -88,7 +88,7 @@ const pdfMaking = async(pdfName) => {
 
     data.on("error", (err)=>console.error("An error occured during reading: ", err));
 
-    console.log(pdfContent.content)
+    // console.log(pdfContent.content)
 
     setTimeout(()=>{
     const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
