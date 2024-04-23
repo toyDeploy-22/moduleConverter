@@ -83,7 +83,7 @@ async function csv2Json() {
             if(mapArr.length > 2) {
                 newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0])},\n`);
             } else {
-                newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0]) || ""}`);
+                newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0]) || JSON.stringify("")}`);
                 break;
             }
         }

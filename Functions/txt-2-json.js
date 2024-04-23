@@ -83,7 +83,7 @@ async function txt2Json() {
             if(mapArr.length > 2) {
                 newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0])},\n`);
             } else {
-                newStream.write(`"${mapArr.splice(0, 1)[0]}": "${mapArr.splice(0,1)[0] || ""}"`);
+                newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0]) || JSON.stringify("")}`);
                 break;
             }
         }

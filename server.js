@@ -13,6 +13,7 @@ import Js_Txt_conv from './js-txt-routes.js';
 import csv_pdf_conv from './csv-pdf-routes.js';
 import pdf_csv_conv from './pdf-csv-routes.js';
 import pdf_json_conv from './pdf-json-routes.js';
+import Json_txt_conv from './json-txt-routes.js';
 import sendError from "./Functions/errorEvents.js";
 // 3rd Party:
 import Express from "express";
@@ -25,6 +26,7 @@ const convertions = [
     Js_Txt_conv,
     Json_convertions,
     Json_csv_conv,
+    Json_txt_conv,
     csv_convertions,
     Csv_json_conv , 
     csv_txt_conv,
