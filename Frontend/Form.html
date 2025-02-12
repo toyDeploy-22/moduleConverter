@@ -290,7 +290,7 @@ downloadLink.setAttribute("target", "_blank");
 	msg = ": Make sure that you have selected the correct file extension.";
 	break;
 	default:
-	msg = ": An error occured during the process. Make sure that the syntax of your file is correct."
+	msg = ": An error occured during the process. Make sure that the extension of your target file is allowed and corresponds to your the selection."
 	}
 	failure.setAttribute("class", "show");
 	failure.innerHTML = failure_title + msg
@@ -301,7 +301,7 @@ userSelection.setAttribute("class", "notSelected");
 userSelection.innerHTML = "Make sure you have uploaded a file and selected a format before submission"
 }	
 } catch(err) {
-console.error({message: err});
+console.error(err);
 failure.setAttribute("class", "show");
 } 
 }

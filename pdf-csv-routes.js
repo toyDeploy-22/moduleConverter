@@ -11,6 +11,7 @@ import Express from "express";
 const pdf_csv_conv = Express.Router();
 let downloadFile = {};
 
+		pdf_csv_conv.options("/pdf-2-csv", cors())
         pdf_csv_conv.post("/pdf-2-csv", cors(), pdfUpload, async(req, res, next )=>{  
         
           try {

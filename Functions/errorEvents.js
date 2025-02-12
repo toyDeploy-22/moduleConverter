@@ -8,13 +8,13 @@ function findError(error) {
         case "404": 
         result.code = error.code;
         result.err = true;
-        result.msg = error.msg;
+        result.msg = error.message;
         break; 
 
         default:
         result.code = 500;
         result.err = true;
-        result.msg = error.msg;
+        result.msg = error.message;
     }
     return result;
 }
