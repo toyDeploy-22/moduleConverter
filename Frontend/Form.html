@@ -285,6 +285,7 @@ downloadLink.setAttribute("target", "_blank");
 	console.error(Resp);
 	const failure_title = Resp.statusText || "Failed";
 	let msg = '';
+	
 	switch(Resp.status.toString()) {
 	case "401":
 	msg = ": Make sure that you have selected the correct file extension.";
