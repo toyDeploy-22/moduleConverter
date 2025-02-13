@@ -9,14 +9,13 @@ import multer from "multer";
 // destruct/constants/variables
 const { readFile, writeFile } = fsp;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newCsvFile;
 
 const csvStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const csvName = `New_Csv-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -29,6 +28,12 @@ const csvUpload = multer({
     storage: csvStorage,
     }).single("uplFile");
 
+const JS_Folder = join(conversionFolder, "JS");
+const folderCheck = multer.diskStorage({
+    destination: JS_Folder
+});
+multer({ storage: folderCheck});
+
 function csvCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
@@ -39,12 +44,12 @@ function csvCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "Not converted. Please make sure that the file has a csv extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -60,13 +65,13 @@ async function csv2Js(){
     let result = {};
     
     try {
-    const originalFile = await readFile((join(join(conversionFolder,"./UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
+    const originalFile = await readFile((join(join(conversionFolder,"UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
     
     const jsBuffer = await jsVify(originalFile);
 
     const newJsName = "New_Convert-" + d.getTime() + ".js";
     
-    await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsBuffer); 
+    await writeFile(join(join(conversionFolder, "JS"), newJsName), jsBuffer); 
    // const newCSV = createWriteStream(join(join(conversionFolder, "./JS"), newJsName)); 
    // newCSV.write()
 
@@ -74,9 +79,9 @@ async function csv2Js(){
     result.error = false;
     result.code = 201;
     result.newFileName = newJsName;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.filePath = join(join(conversionFolder, "./JS"), newJsName);
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
+    result.filePath = join(join(conversionFolder, "JS"), newJsName);
     result.msg = "CSV file successfully converted to JS. Ready for download.";
     return result;
 
@@ -84,9 +89,9 @@ async function csv2Js(){
     console.error(err);
     result.error = true;
     result.code = 500;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.msg = "The conversion process stopped due to the following issue: " + err;
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
+    result.msg = "The conversion process stopped due to the following issue: " + err.message;
     return result;
     }
 }
