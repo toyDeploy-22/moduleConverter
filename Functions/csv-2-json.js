@@ -12,14 +12,13 @@ import multer from "multer";
 const { readFile } = fsp;
 const { createWriteStream } = fs;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newCsvFile;
 
 const csvStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const csvName = `New_Csv-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -32,6 +31,13 @@ const csvUpload = multer({
     storage: csvStorage,
     }).single("uplFile");
 
+    const JSON_Folder = join(conversionFolder, "JSON");
+    const folderCheck = multer.diskStorage({
+        destination: JSON_Folder
+    });
+
+    multer({ storage: folderCheck});
+
 function csvCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
@@ -42,13 +48,13 @@ function csvCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
         result.msg = "Not converted. Please make sure that the file has a csv extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -62,13 +68,13 @@ async function csv2Json() {
     const newJsonName = "New_Convert-" + d.getTime() + ".json"; 
     
 // await readFile(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"});
-    const csvBuffer = (await readFile(join(join(conversionFolder,"./UPLOAD"), newCsvFile), { encoding: 'utf-8'})); 
+    const csvBuffer = (await readFile(join(join(conversionFolder,"UPLOAD"), newCsvFile), { encoding: 'utf-8'})); 
 
     // const jsonBuffer = await JSON.parse(content);
 
     // await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
 
-    const newContent = createWriteStream(join(join(conversionFolder, "./JSON"), newJsonName));
+    const newContent = createWriteStream(join(join(conversionFolder, "JSON"), newJsonName));
     const preArr = csvBuffer.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, ''); 
     // all special characters to remove
     
@@ -94,25 +100,28 @@ async function csv2Json() {
     propVal(splittedArr, newContent);    
     newContent.write("}]");
     newContent.on("error", (err)=>{
-        console.error("CSV Writing error conversion to JSON: " + err)
+        const errMsg = `: ${err.message}` || ". Check object above."
+        console.error(err);
+        console.log("CSV Writing error conversion to JSON" + errMsg)
     });
     newContent.end();
 
     result.error = false;
     result.code = 201;
     result.newFileName = newJsonName;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.filePath = join(join(conversionFolder, "./JSON"), newJsonName);
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
+    result.filePath = join(join(conversionFolder, "JSON"), newJsonName);
     result.msg = "CSV file successfully converted to JSON. Ready for download.";
     return result;
     } catch(err) { 
+        const errMsg = `: ${err.msg}` || ". Check object above.";
         console.error(err);
         result.error = true;
         result.code = 500;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-        result.msg = "The conversion process stopped due to the following issue: " + err;
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
+        result.msg = "The conversion process stopped" + errMsg;
         return result;
     }
 } 

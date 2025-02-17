@@ -9,14 +9,13 @@ import fse from "fs-extra";
 // destruct/constants/variables
 const { readJson, createWriteStream } = fse;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newJsonFile;
 
 const jsStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const jsonName = `New_Json-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -24,6 +23,12 @@ const jsStorage = multer.diskStorage({
       cb(null, newJsonFile)
     }
 });
+
+const JS_Folder = join(conversionFolder, "JS");
+const folderCheck = multer.diskStorage({
+    destination: JS_Folder
+});
+multer({ storage: folderCheck});
 
 const jsonUpload = multer({
     storage: jsStorage,
@@ -39,13 +44,13 @@ function jsonCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"));
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsonFile);
         result.msg = "Not converted. Please make sure that the file has a json extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -59,13 +64,13 @@ async function Json2Js() {
     const newJsName = "New_Convert-" + d.getTime() + ".js"; 
     
 // await readFile(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"});
-    const jsonBuffer = await readJson(join(join(conversionFolder,"./UPLOAD"), newJsonFile)); 
+    const jsonBuffer = await readJson(join(join(conversionFolder,"UPLOAD"), newJsonFile)); 
 
     // const jsonBuffer = await JSON.parse(content);
 
     // await writeFile(join(join(conversionFolder, "./JS"), newJsName), jsonBuffer); 
 
-    const newContent = createWriteStream(join(join(conversionFolder, "./JS"), newJsName));
+    const newContent = createWriteStream(join(join(conversionFolder, "JS"), newJsName));
 
     const characterEntry=(v)=>{
         let value = v; 
@@ -85,24 +90,27 @@ async function Json2Js() {
             
     newContent.write("}]");
     newContent.on("error", (err)=>{
-        console.error("JSON Writing error conversion to JS: " + err)
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        console.log("JSON Writing error conversion to JS: " + errMsg)
     })
 
     result.error = false;
     result.code = 201;
     result.newFileName = newJsName;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
-    result.filePath = join(join(conversionFolder, "./JS"), newJsName);
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsonFile);
+    result.filePath = join(join(conversionFolder, "JS"), newJsName);
     result.msg = "JSON file successfully converted to JS. Ready for download.";
     return result;
     } catch(err) { 
+        const errMsg = `: ${err.message}` || ". Check object above";
         console.error(err);
         result.error = true;
         result.code = 500;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
-        result.msg = "The conversion process stopped due to the following issue: " + err;
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsonFile);
+        result.msg = "The conversion process stopped due to the following issue: " + errMsg;
         return result;
     }
 } 

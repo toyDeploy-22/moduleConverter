@@ -86,12 +86,13 @@ async function csv2Js(){
     return result;
 
 } catch(err) { 
+    const errMsg = `: ${err.message}` || ". Check object above."
     console.error(err);
     result.error = true;
     result.code = 500;
     result.uploadFolder = join(conversionFolder,"UPLOAD");
     result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
-    result.msg = "The conversion process stopped due to the following issue: " + err.message;
+    result.msg = "The conversion process stopped" + errMsg;
     return result;
     }
 }

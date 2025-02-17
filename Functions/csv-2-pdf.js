@@ -11,14 +11,13 @@ import PdfPrinter from "pdfmake";
 // destruct/constants/variables
 const { createReadStream, createWriteStream } = fse;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newCsvFile;
 
 const csvStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const csvName = `New_Csv-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -31,6 +30,13 @@ const csvUpload = multer({
     storage: csvStorage,
     }).single("uplFile");
 
+    const PDF_Folder = join(conversionFolder, "PDF");
+    const folderCheck = multer.diskStorage({
+        destination: PDF_Folder
+    });
+
+    multer({ storage: folderCheck});
+
 function csvCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
     const authorizedFormat = file.mimetype.split("/"); // removes the "/" in mimetype.
@@ -41,12 +47,12 @@ function csvCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "Not converted. Please make sure that the file has a csv extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -66,7 +72,7 @@ async function Csv2Pdf(){
 
           const Printer = new PdfPrinter(fonts);
           const newPdfName = "New_Convert-" + d.getTime() + ".pdf";
-          const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), newPdfName)); 
+          const newPdfDoc = createWriteStream(join(join(conversionFolder, "PDF"), newPdfName)); 
           
           const pdfContent = {
         content: [
@@ -78,7 +84,7 @@ async function Csv2Pdf(){
         }
     }; 
 
-    const csv = createReadStream((join(join(conversionFolder,"./UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
+    const csv = createReadStream((join(join(conversionFolder,"UPLOAD"), newCsvFile)), { encoding: 'utf-8'});
 
     csv.on("data", (chunk)=>{
         const newContent = {text: chunk, style: 'defaultStyle'};
@@ -86,14 +92,18 @@ async function Csv2Pdf(){
     })
 
     csv.on("error", (err)=>{
-        console.error("Error on reading file, " + err)
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        console.log("Error on reading file" + errMsg)
     });
 
     setTimeout(()=>{
         const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
         pdfDoc.pipe(newPdfDoc);
         pdfDoc.on("error", (err)=>{
-            console.error("An error occured during PDF writing: " + err)
+            const errMsg = `: ${err.message}` || ". Check object above";
+            console.error(err);
+            console.log("An error occured during PDF writing" + errMsg)
         }) 
         pdfDoc.end();
         }, 800)
@@ -101,18 +111,19 @@ async function Csv2Pdf(){
     result.error = false;
     result.code = 201;
     result.newFileName = newPdfName;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.filePath = join(join(conversionFolder, "./PDF"), newPdfName);
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
+    result.filePath = join(join(conversionFolder, "PDF"), newPdfName);
     result.msg = "CSV file successfully converted to PDF. Ready for download.";
     return result;
 } catch(err) { 
+    const errMsg = `: ${err.message}` || ". Check object above";
     console.error(err);
     result.error = true;
-    result.code = err.code || 500;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newCsvFile);
-    result.msg = err.message || "CSV to PDF conversion stopped: " + err;
+    result.code = 500;
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newCsvFile);
+    result.msg = "CSV to PDF conversion stopped" + errMsg;
     return result;
     }
 }

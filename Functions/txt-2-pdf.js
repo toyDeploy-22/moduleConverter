@@ -10,14 +10,13 @@ import PdfPrinter from "pdfmake";
 // destruct/constants/variables
 const { createReadStream, createWriteStream } = fse;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newTxtFile;
 
 const txtStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const txtName = `New_Txt-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -29,6 +28,13 @@ const txtStorage = multer.diskStorage({
 const txtUpload = multer({
     storage: txtStorage,
     }).single("uplFile");
+
+    const PDF_Folder = join(conversionFolder, "PDF");
+    const folderCheck = multer.diskStorage({
+                destination: PDF_Folder
+            });
+        
+    multer({ storage: folderCheck});
     
 function txtCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
@@ -40,13 +46,13 @@ function txtCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newTxtFile);
         result.msg = "Not converted. Please make sure that the file has a text extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -55,7 +61,7 @@ function txtCheck(file) {
 const newPdfFile = "New_Convert-" + d.getTime() + ".pdf"; 
 
 const pdfMaking = async(pdfName) => {
-    
+    const result = {}    
     try {
     const fonts = {
         Roboto: {
@@ -65,7 +71,7 @@ const pdfMaking = async(pdfName) => {
     
     const Printer = new PdfPrinter(fonts);
     
-    const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), pdfName));
+    const newPdfDoc = createWriteStream(join(join(conversionFolder, "PDF"), pdfName));
 
     // const dataContent = data; 
 
@@ -79,14 +85,23 @@ const pdfMaking = async(pdfName) => {
         }
     }; 
 
-    let data = createReadStream(join(join(conversionFolder,"./UPLOAD"), newTxtFile), { encoding: 'utf-8' });
+    let data = createReadStream(join(join(conversionFolder,"UPLOAD"), newTxtFile), { encoding: 'utf-8' });
 
     data.on("data", (chunk)=> {
         const options = {text: `${chunk.toString()},`, style: 'defaultStyle'};
         pdfContent.content.push(options);
+        result.error = false
     });
 
-    data.on("error", (err)=>console.error("An error occured during reading: ", err));
+    data.on("error", (err)=>{
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        result.error = true;
+        result.code = 401;
+        result.msg = errMsg 
+        console.log("An error occured during reading: " + errMsg)
+        return result
+        });
 
     // console.log(pdfContent.content)
 
@@ -94,12 +109,24 @@ const pdfMaking = async(pdfName) => {
     const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
     pdfDoc.pipe(newPdfDoc);
     pdfDoc.on("error", (err)=>{
-        console.error("An error occured during PDF writing: " + err)
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        result.error = true;
+        result.code = 401;
+        result.msg = errMsg
+        console.log("An error occured during PDF writing: " + err)
     }) 
     pdfDoc.end();
-    }, 800)
+    }, 800);
+    return result
     } catch(err) {
-        console.error("PDF not created: " + err)
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        result.error = true;
+        result.code = 500;
+        result.msg = errMsg
+        console.log("PDF not created: " + errMsg);
+        return result
     }
 }
 
@@ -109,25 +136,34 @@ async function txt2Pdf() {
 
     try{
         
-    await pdfMaking(newPdfFile);
+    const createPDF = await pdfMaking(newPdfFile);
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
-    
+    if(createPDF.error) {
+    const errMsg = `: ${err.message}` || ". Check object above";
+    result.error = true;
+    result.code = 401;  
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newTxtFile);
+    result.msg = errMsg;
+        return result;
+    } else {
     result.error = false;
     result.code = 201;
     result.newFileName = newPdfFile;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
-    result.filePath = join(join(conversionFolder, "./PDF"), newPdfFile);
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newTxtFile);
+    result.filePath = join(join(conversionFolder, "PDF"), newPdfFile);
     result.msg = "TXT file successfully converted to PDF. Ready for download.";
-    return result;
+    return result}
 
     } catch(err) { 
+        const errMsg = `: ${err.message}` || ". Check object above";
         console.error(err);
         result.error = true;
         result.code = 500;  
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newTxtFile);
-        result.msg = "The conversion process stopped due to the following issue: " + err;
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newTxtFile);
+        result.msg = "The conversion process stopped due to the following issue: " + errMsg;
         return result;
     }
 } 

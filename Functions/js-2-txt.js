@@ -9,14 +9,13 @@ import multer from "multer";
 // destruct/constants/variables
 const { readFile, writeFile } = fsp;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newJsFile;
 
 const jsStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const jsName = `New_Js-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -29,6 +28,12 @@ const jsUpload = multer({
     storage: jsStorage,
     }).single("uplFile");
 
+    const TXT_Folder = join(conversionFolder, "TXT");
+    const folderCheck = multer.diskStorage({
+        destination: TXT_Folder
+    });
+
+    multer({ storage: folderCheck});
 
 function jsCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
@@ -40,12 +45,12 @@ function jsCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "Not converted. Please make sure that the file has a javascript extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -58,28 +63,27 @@ async function Js2Txt(){
     try{
         const newTxtName = "New_Convert-" + d.getTime() + ".txt";
     
-        const jsBuffer = await readFile(join(join(conversionFolder,"./UPLOAD"), newJsFile), {encoding: "utf8"}); 
+        const jsBuffer = await readFile(join(join(conversionFolder,"UPLOAD"), newJsFile), {encoding: "utf8"}); 
     
-        await writeFile(join(join(conversionFolder, "./TXT"), newTxtName), jsBuffer); 
+        await writeFile(join(join(conversionFolder, "TXT"), newTxtName), jsBuffer); 
         
         result.error = false;
         result.code = 201;
         result.newFileName = newTxtName;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-        result.filePath = join(join(conversionFolder, "./TXT"), newTxtName);
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsFile);
+        result.filePath = join(join(conversionFolder, "TXT"), newTxtName);
         result.msg = "JS file successfully converted to TXT. Ready for download.";
         return result;
   } catch(err) { 
-    
+    const errMsg = `: ${err.message}` || ". Check object above";
     console.error(err);
     result.error = true;
     result.code = 500;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsFile);
-    result.msg = "JS to TXT conversion stopped: " + err;
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsFile);
+    result.msg = "JS to TXT conversion stopped" + errMsg;
     return result;
-
   }
 
 }

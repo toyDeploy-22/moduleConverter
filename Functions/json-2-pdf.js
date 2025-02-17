@@ -10,14 +10,13 @@ import PdfPrinter from "pdfmake";
 // destruct/constants/variables
 const { readJSON, createWriteStream } = fse;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newJsonFile;
 
 const jsonStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const jsonName = `New_Json-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -26,9 +25,16 @@ const jsonStorage = multer.diskStorage({
     }
 });
 
-const jsonUpload = multer({
+    const jsonUpload = multer({
     storage: jsonStorage,
     }).single("uplFile");
+
+    const PDF_Folder = join(conversionFolder, "PDF");
+    const folderCheck = multer.diskStorage({
+            destination: PDF_Folder
+        });
+    
+        multer({ storage: folderCheck});
     
 function jsonCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
@@ -40,13 +46,13 @@ function jsonCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsonFile);
         result.msg = "Not converted. Please make sure that the file has a json extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -65,9 +71,9 @@ const pdfMaking = async(pdfName) => {
     
     const Printer = new PdfPrinter(fonts);
     
-    const newPdfDoc = createWriteStream(join(join(conversionFolder, "./PDF"), pdfName));
+    const newPdfDoc = createWriteStream(join(join(conversionFolder, "PDF"), pdfName));
 
-    let data = await readJSON(join(join(conversionFolder,"./UPLOAD"), newJsonFile), {encoding: "utf8"}); 
+    let data = await readJSON(join(join(conversionFolder,"UPLOAD"), newJsonFile), {encoding: "utf8"}); 
     const dataContent = Array.isArray(data) ? data[0] : data; 
 
     const pdfContent = {
@@ -87,11 +93,15 @@ const pdfMaking = async(pdfName) => {
     const pdfDoc = Printer.createPdfKitDocument(pdfContent) 
     pdfDoc.pipe(newPdfDoc);
     pdfDoc.on("error", (err)=>{
-        console.error("An error occured during PDF writing: " + err)
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        console.log("An error occured during PDF writing: " + errMsg)
     }) 
     pdfDoc.end();
     } catch(err) {
-        console.error("PDF not created: " + err)
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        console.error("PDF not created: " + errMsg)
     }
 }
 
@@ -107,9 +117,9 @@ async function Json2Pdf() {
     result.error = false;
     result.code = 201;
     result.newFileName = newPdfFile;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
-    result.filePath = join(join(conversionFolder, "./PDF"), newPdfFile);
+    result.uploadFolder = join(conversionFolder,"UPLOAD");
+    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsonFile);
+    result.filePath = join(join(conversionFolder, "PDF"), newPdfFile);
     result.msg = "JSON file successfully converted to PDF. Ready for download.";
     return result;
 
@@ -117,8 +127,8 @@ async function Json2Pdf() {
         console.error(err);
         result.error = true;
         result.code = 500;  
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newJsonFile);
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newJsonFile);
         result.msg = "The conversion process stopped due to the following issue: " + err;
         return result;
     }

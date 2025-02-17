@@ -10,14 +10,13 @@ import pdfUtil from "pdf-to-text";
 // destruct/constants/variables
 const { createWriteStream } = fse;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "../Conversion");
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
+
 const d = new Date;
 let newPdfFile;
 
 const pdfStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, `${conversionFolder}/UPLOAD`)
-    },
+    destination: join(conversionFolder, "UPLOAD"),
     filename: function (req, file, cb) {
       const pdfName = `New_Pdf-${d.getTime()}`;
       const ExtName = extname(file.originalname).toLowerCase(); 
@@ -29,6 +28,13 @@ const pdfStorage = multer.diskStorage({
 const pdfUpload = multer({
     storage: pdfStorage,
     }).single("uplFile");
+
+    const CSV_Folder = join(conversionFolder, "CSV");
+    const folderCheck = multer.diskStorage({
+            destination: CSV_Folder
+        });
+    
+    multer({ storage: folderCheck});
     
 function pdfCheck(file) {
     const extensionFormat = extname(file.originalname).toLowerCase(); // returns extension preceded by a dot "."
@@ -40,13 +46,13 @@ function pdfCheck(file) {
     if (!checkFormat) {
         result.error = true;
         result.code = 401;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
+        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
         result.msg = "Not converted. Please make sure that the file has a pdf extension."
     } else {
         result.error = false;
         result.code = 200;
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = "File authorized."
     }
     return result;
@@ -63,25 +69,30 @@ const contentToCsv = (content) => {
 
 const csvMaking = (newFileName) => {
 
-    const pdfPath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
+    const pdfPath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
     const result = new Object();
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
     pdfUtil.pdfToText(pdfPath, function(err, data) {
         if (err) {
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
         result.error = true;
-        result.msg = err;
+        result.msg = errMsg;
         return result
         } else {
+        result.error = false;
         const newCsvDoc = createWriteStream(join(csvPath, newFileName));
         const newData = contentToCsv(data);
         console.log(newData)
         setTimeout(()=>{ 
         newCsvDoc.write(newData) //print all text
         newCsvDoc.on("error", (err)=>{
+            const errMsg = `: ${err.message}` || ". Check object above";
+            console.error(err);
             result.error = true;
-            result.msg = err;
-            console.error("An error occured during txt writing: " + err);
+            result.msg = errMsg;
+            console.log("An error occured during txt writing: " + errMsg);
             return result;
         });
         newCsvDoc.end();
@@ -93,30 +104,40 @@ const csvMaking = (newFileName) => {
 
 async function Pdf2Csv() { 
     
-    let result ={};
+    let result = {};
 
     try{
        
-    csvMaking(newCsvFile);
+    const createCSV = csvMaking(newCsvFile);
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
-    
-    result.error = false;
-    result.code = 201;
-    result.newFileName = newCsvFile;
-    result.uploadFolder = join(conversionFolder,"./UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
-    result.filePath = join(join(conversionFolder, "./CSV"), newCsvFile);
-    result.msg = "PDF file successfully converted to CSV. Ready for download.";
-    return result;
-
+    if(createCSV.error) {
+    result = {
+    error: true,
+    code: 401,
+    msg: "Something went wrong during the CSV creation: " + createCSV.msg
+        }
+    return result
+    } else {
+    result = {
+    error: false,
+    code: 201,
+    newFileName: newCsvFile,
+    uploadFolder: join(conversionFolder,"UPLOAD"),
+    originalFilePath: join(join(conversionFolder,"UPLOAD"), newPdfFile),
+    filePath: join(join(conversionFolder, "CSV"), newCsvFile),
+    msg: "PDF file successfully converted to CSV. Ready for download."}}
+    return result
     } catch(err) { 
+        const errMsg = `: ${err.message}` || ". Check object above";
         console.error(err);
-        result.error = true;
-        result.code = 500;  
-        result.uploadFolder = join(conversionFolder,"./UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"./UPLOAD"), newPdfFile);
-        result.msg = "The conversion process stopped due to the following issue: " + err.msg;
-        return result;
+        result = {
+        error: true,
+        code: 500,  
+        uploadFolder: join(conversionFolder,"UPLOAD"),
+        originalFilePath: join(join(conversionFolder,"UPLOAD"), newPdfFile),
+        msg: "The conversion process stopped due to the following issue: " + errMsg
+        }
+        return result
     }
 } 
 

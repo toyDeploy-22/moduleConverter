@@ -300,12 +300,12 @@ waitEvent = false;
 waitingMsg.classList.add("notShow");	
 userSelection.setAttribute("class", "notSelected");
 userSelection.innerHTML = "Make sure you have uploaded a file and selected a format before submission"
-}	
-} catch(err) {
+		}	
+	} catch(err) {
 console.error(err);
 failure.setAttribute("class", "show");
-} 
-}
+		} 
+	}
 const sendFileAsync = (e) => {
 e.preventDefault();
 waitEvent = true;
