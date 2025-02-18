@@ -78,6 +78,7 @@ const isObject = (buffer) => {
         const err = {
         error: true,
         code: 401,
+        uploadFolder: join(conversionFolder,"UPLOAD"),
         msg: "Conversion stopped: Your file should be an array containing a json Object or just a json Object.",
         }
         newBuffer = false;

@@ -107,6 +107,7 @@ async function Pdf2Txt() {
     result = {
     error: true,
     code: 401,
+    uploadFolder: join(conversionFolder,"UPLOAD"),
     msg: "Something went wrong during the TXT creation: " + createTXT.msg
         }
     return result

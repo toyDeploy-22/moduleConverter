@@ -52,5 +52,5 @@ myServer.on("error", (err)=>{
     console.error({
         err: true,
         type: "Server crashing",
-        msg: err})
+        msg: err.message})
 })

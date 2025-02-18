@@ -98,6 +98,7 @@ const pdfMaking = async(pdfName) => {
         console.error(err);
         result.error = true;
         result.code = 401;
+        result.uploadFolder = join(conversionFolder,"UPLOAD");
         result.msg = errMsg 
         console.log("An error occured during reading: " + errMsg)
         return result
@@ -143,7 +144,6 @@ async function txt2Pdf() {
     result.error = true;
     result.code = 401;  
     result.uploadFolder = join(conversionFolder,"UPLOAD");
-    result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newTxtFile);
     result.msg = errMsg;
         return result;
     } else {

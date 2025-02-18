@@ -114,6 +114,7 @@ async function Pdf2Csv() {
     result = {
     error: true,
     code: 401,
+    uploadFolder: join(conversionFolder,"UPLOAD"),
     msg: "Something went wrong during the CSV creation: " + createCSV.msg
         }
     return result

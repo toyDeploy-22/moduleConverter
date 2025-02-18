@@ -24,7 +24,7 @@ Csv_json_conv.post("/csv-2-json", cors(), csvUpload, async(req, res, next )=>{
           console.error(checker.msg);
           emptyDir(checker.uploadFolder, (err)=>{
             if(err) {
-              console.error("No file found to destroy: " + err)
+              console.error("No file found to destroy: " + err.message)
             } else { 
               console.log("File destroyed.")
             }
@@ -41,7 +41,7 @@ Csv_json_conv.post("/csv-2-json", cors(), csvUpload, async(req, res, next )=>{
             if(newCsvFile.uploadFolder) {
               emptyDir(err.uploadFolder, (err)=>{
               if(err){
-                console.error("Cannot destroy file uploaded: ", err)
+                console.error("Cannot destroy file uploaded: ", err.message)
               } else {
                 console.log("File uploaded destruction OK")
               }
@@ -102,7 +102,7 @@ Csv_json_conv.post("/csv-2-json", cors(), csvUpload, async(req, res, next )=>{
       // await pipeline(createReadStream(filePath), res);
       res.download(filePath, (err)=>{
       if(err){
-        console.error("Download process failed: " , err);
+        console.error("Download process failed: " , err.message);
       } else { 
         console.log(msg)
       }
@@ -114,7 +114,7 @@ Csv_json_conv.post("/csv-2-json", cors(), csvUpload, async(req, res, next )=>{
          [originalFilePath, filePath].map((file, _ind)=>{ 
           remove(file, (err)=>{
             if(err){
-              console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
+              console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err.message)
             } else {
               console.log("File nº " + Number(_ind+1) + " destruction OK")
           }
@@ -130,7 +130,7 @@ Csv_json_conv.post("/csv-2-json", cors(), csvUpload, async(req, res, next )=>{
         if(err.uploadFolder) {
             emptyDir(err.uploadFolder, (err)=>{
             if(err){
-              console.error("Cannot destroy file uploaded: ", err)
+              console.error("Cannot destroy file uploaded: ", err.message)
             } else {
               console.log("File uploaded destruction OK")
             }

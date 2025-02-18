@@ -49,7 +49,6 @@ function txtCheck(file) {
         result.error = true;
         result.code = 401;
         result.uploadFolder = join(conversionFolder,"UPLOAD");
-        result.originalFilePath = join(join(conversionFolder,"UPLOAD"), newTxtFile);
         result.msg = "Not converted. Please make sure that the file has a txt extension."
     } else {
         result.error = false;

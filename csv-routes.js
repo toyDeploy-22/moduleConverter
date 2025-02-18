@@ -26,7 +26,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           console.error(checker.msg); 
           emptyDir(checker.uploadFolder, (err)=>{
             if(err) {
-              console.error("No file found to destroy: " + err)
+              console.error("No file found to destroy: " + err.message)
             } else { 
               console.log("File destroyed.")
             }
@@ -42,7 +42,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           } else { 
             emptyDir(newCsvFile.uploadFolder, (err)=>{
               if(err) {
-                console.error("No file found to destroy: " + err)
+                console.error("No file found to destroy: " + err.message)
               } else { 
                 console.log("File destroyed.")
               }
@@ -77,13 +77,13 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
               if(err.uploadFolder) {
                 emptyDir(err.uploadFolder, (err)=>{
                 if(err){
-                  console.error("Cannot destroy file uploaded: ", err)
+                  console.error("Cannot destroy file uploaded: ", err.message)
                 } else {
                   console.log("File uploaded destruction OK")
                 }
                 })
                 }
-              res.status(500).send( err.msg || msg_2 )
+              res.status(500).send( err.message || msg_2 )
             }
           });
 
@@ -102,7 +102,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           // await pipeline(createReadStream(filePath), res);
           res.download(filePath, (err)=>{
           if(err){
-            console.error("Download process failed: " , err);
+            console.error("Download process failed: " , err.message);
           } else { 
             console.log(msg)
           }
@@ -114,7 +114,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
             [originalFilePath, filePath].map((file, _ind)=>{ 
               remove(file, (err)=>{
                 if(err){
-                  console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
+                  console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err.message)
                 } else {
                   console.log("File nº " + Number(_ind+1) + " destruction OK")
               }
@@ -129,13 +129,13 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
             if(err.uploadFolder) {
               emptyDir(err.uploadFolder, (err)=>{
               if(err){
-                console.error("Cannot destroy file uploaded: ", err)
+                console.error("Cannot destroy file uploaded: ", err.message)
               } else {
                 console.log("File uploaded destruction OK")
               }
               })
               }
-            res.status(500).send( err || "An error occured. Please try again." )
+            res.status(500).send( err.message || "An error occured. Please try again." )
             }
           })
 
@@ -153,7 +153,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
               console.error(checker.msg);
               emptyDir(checker.uploadFolder, (err)=>{
                 if(err) {
-                  console.error("No file found to destroy: " + err)
+                  console.error("No file found to destroy: " + err.message)
                 } else { 
                   console.log("File destroyed.")
                 }
@@ -170,7 +170,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
               if(newJsFile.uploadFolder) {
                 emptyDir(newJsFile.uploadFolder, (err)=>{
                 if(err){
-                  console.error("Cannot destroy file uploaded: ", err)
+                  console.error("Cannot destroy file uploaded: ", err.message)
                 } else {
                   console.log("File uploaded destruction OK")
                 }
@@ -208,13 +208,13 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
             if(err.uploadFolder) {
             emptyDir(err.uploadFolder, (err)=>{
             if(err){
-              console.error("Cannot destroy file uploaded: ", err)
+              console.error("Cannot destroy file uploaded: ", err.message)
             } else {
               console.log("File uploaded destruction OK")
             }
             })
             }
-            res.status(500).send( err.msg || msg_2 )
+            res.status(500).send( err.message || msg_2 )
           }
         });
 
@@ -231,7 +231,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
         // await pipeline(createReadStream(filePath), res);
         res.download(filePath, (err)=>{
         if(err){
-          console.error("Download process failed: " , err);
+          console.error("Download process failed: " , err.message);
         } else { 
           console.log(msg)
         }
@@ -243,7 +243,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           [originalFilePath, filePath].map((file, _ind)=>{ 
             remove(file, (err)=>{
               if(err){
-                console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err)
+                console.error("Cannot destroy file nº " + Number(_ind+1) + ": ", err.message)
               } else {
                 console.log("File nº " + Number(_ind+1) + " destruction OK")
             }
@@ -255,7 +255,7 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           if(downloadFile.uploadFolder) {
             emptyDir(downloadFile.uploadFolder, (err)=>{
             if(err){
-              console.error("Cannot destroy file uploaded: ", err)
+              console.error("Cannot destroy file uploaded: ", err.message)
             } else {
               console.log("File uploaded destruction OK")
             }
@@ -268,14 +268,14 @@ csv_convertions.post("/js-2-csv", cors(), jsUpload, async(req, res, next )=>{
           if(err.uploadFolder) {
             emptyDir(err.uploadFolder, (err)=>{
             if(err){
-              console.error("Cannot destroy file uploaded: ", err)
+              console.error("Cannot destroy file uploaded: ", err.message)
             } else {
               console.log("File uploaded destruction OK")
             }
             })
             }
             downloadFile = {};
-          res.status(500).send( err || "An error occured. Please try again." )
+          res.status(500).send( err.message || "An error occured. Please try again." )
           }
         })
 

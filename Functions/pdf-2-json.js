@@ -126,6 +126,7 @@ async function Pdf2Json() {
     result = {
     error: true,
     code: 401,
+    uploadFolder: join(conversionFolder,"UPLOAD"),
     msg: "Something went wrong during the JSON file creation: " + createCSV.msg
         }
     return result

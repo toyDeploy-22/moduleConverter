@@ -23,6 +23,7 @@ _This app converts files to ´´´.js´´´, ´´´.txt´´´, ´´´´.json´´
 ### Characteristics ###
 
 - The files will also appear in the ´´´Conversion´´´ folder once uploaded and converted
+- The uploaded and converted files are deleted once converted file is downloaded
 <br />
 <img alt="Form" src="src/gifs/Foodbooking_(Form).gif" width="800" height="600" />
 

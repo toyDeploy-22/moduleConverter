@@ -98,6 +98,7 @@ async function txt2Csv(){
         result = {
         error: true,
         code: 401,
+        uploadFolder: join(conversionFolder,"UPLOAD"),
         msg: errMsg
         }
         return result
