@@ -9,7 +9,7 @@ import multer from "multer";
 // destruct/constants/variables
 const { readFile, writeFile } = fsp;
 
-const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", Conversion);
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
 
 const d = new Date;
 let newJsFile;

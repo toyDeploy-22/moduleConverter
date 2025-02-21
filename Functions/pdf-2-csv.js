@@ -1,19 +1,22 @@
 // Core:
 import  { dirname, join, extname } from "path";
 import { fileURLToPath } from "url";
-import fse from "fs-extra";
+import fs from "fs";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import pdfUtil from "pdf-to-text";
+import PDFParser from "pdf2json";
+// https://www.npmjs.com/package/pdfkit
+// https://github.com/modesty/pdf2json/npm
 
 // destruct/constants/variables
-const { createWriteStream } = fse;
+const { createWriteStream } = fs;
 
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "..", "Conversion");
 
 const d = new Date;
 let newPdfFile;
+const pdfParser = new PDFParser();
 
 const pdfStorage = multer.diskStorage({
     destination: join(conversionFolder, "UPLOAD"),
@@ -59,47 +62,79 @@ function pdfCheck(file) {
 }
 
 const newCsvFile = "New_Convert-" + d.getTime() + ".csv"; 
-const csvPath = join(conversionFolder,"./CSV");
+const csvPath = join(conversionFolder,"CSV");
+
+const extractContent = (pdfFile) => {
+
+    const pdfFilePath =  join(join(conversionFolder,"UPLOAD"), pdfFile);
+    let result = new Object();
+    
+    pdfParser.on("pdfParser_dataReady", (pdfBuffer) => {
+    result = {
+        error: false,
+        data: JSON.stringify(pdfBuffer)
+    }
+    
+    return result
+ })
+
+  pdfParser.on("pdfParser_dataError", (err)=>{
+    console.error(err);
+    result = {
+        error: true,
+        msg: 'Could not access to PDF content.',
+        ...err
+        }
+    return result
+    })
+
+    pdfParser.loadPDF(pdfFilePath)
+
+ }
 
 const contentToCsv = (content) => {
+    try {
     const csvContent = content.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '').split(" ");
     
     return csvContent.join(",");
+    } catch(err) {
+        const errMsg = `: ${err.message}` || ". Check object above";
+        console.error(err);
+        console.log("error at writing content to CSV function: ", errMsg)
+    }
 }
 
-const csvMaking = (newFileName) => {
+const csvMaking = async(newFileName) => {
 
-    const pdfPath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
+try {
     const result = new Object();
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
-    pdfUtil.pdfToText(pdfPath, function(err, data) {
-        if (err) {
-        const errMsg = `: ${err.message}` || ". Check object above";
-        console.error(err);
+    const pdfData = extractContent(newPdfFile);
+
+    if(pdfData.error) {
         result.error = true;
-        result.msg = errMsg;
+        result.msg = pdfData.msg;
         return result
-        } else {
+    } else {
+        const pdfBuffer = await pdfData.data;
+        const PDFToCSV = await contentToCsv(pdfBuffer);
+        
+        const csvContent = createWriteStream(join(csvPath, newFileName));
+        csvContent.write(PDFToCSV);
+
         result.error = false;
-        const newCsvDoc = createWriteStream(join(csvPath, newFileName));
-        const newData = contentToCsv(data);
-        console.log(newData)
-        setTimeout(()=>{ 
-        newCsvDoc.write(newData) //print all text
-        newCsvDoc.on("error", (err)=>{
-            const errMsg = `: ${err.message}` || ". Check object above";
-            console.error(err);
-            result.error = true;
-            result.msg = errMsg;
-            console.log("An error occured during txt writing: " + errMsg);
-            return result;
-        });
-        newCsvDoc.end();
-        }, 800)}    
-    });
-    
-    
+        result.msg = "success";
+        return result        
+        }
+    } catch(err) {
+    const errMsg = `: ${err.message}` || ". Check object above";
+    console.error(err);
+    console.log("An error occured during writing conversion: ", errMsg)
+    result.error = true;
+    result.msg = errMsg;
+    return result
+    }        
 }
 
 async function Pdf2Csv() { 
@@ -108,7 +143,7 @@ async function Pdf2Csv() {
 
     try{
        
-    const createCSV = csvMaking(newCsvFile);
+    const createCSV = await csvMaking(newCsvFile);
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
     if(createCSV.error) {
     result = {

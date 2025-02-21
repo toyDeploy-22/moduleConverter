@@ -5,7 +5,7 @@ import fse from "fs-extra";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import pdfUtil from "pdf-to-text";
+// import pdfUtil from "pdf-to-text";
 
 // destruct/constants/variables
 const { createWriteStream } = fse;
@@ -68,6 +68,8 @@ const txtMaking = (newFileName) => {
     let result = {};
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
+
+        /**
     pdfUtil.pdfToText(pdfPath, function(err, data) {
         if (err) {
         const errMsg = `: ${err.message}` || ". Check object above";
@@ -91,7 +93,7 @@ const txtMaking = (newFileName) => {
         newTtxtDoc.end();
         }    
     });
-    
+    */
     return result
 }
 

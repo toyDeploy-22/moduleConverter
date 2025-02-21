@@ -5,7 +5,7 @@ import fse from "fs-extra";
 // Local:
 // 3rd Party:
 import multer from "multer";
-import pdfUtil from "pdf-to-text";
+// import pdfUtil from "pdf-to-text";
 
 // destruct/constants/variables
 const { createWriteStream } = fse;
@@ -87,6 +87,8 @@ const jsonMaking = (newFileName) => {
     const pdfPath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
+
+        /*
     pdfUtil.pdfToText(pdfPath, function(err, data) {
         if (err) {
         const errMsg = `: ${err.message}` || ". Check object above";
@@ -112,6 +114,7 @@ const jsonMaking = (newFileName) => {
         newJsonDoc.end();
         }, 950)}    
     });
+    */
 }
 
 async function Pdf2Json() { 
