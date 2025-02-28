@@ -1,15 +1,23 @@
 // Core:
 // import { unlink } from "fs";
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url'; 
 import { emptyDir, remove } from "fs-extra";
 // import { pipeline } from "stream/promises";
 // Local:
 import { pdfUpload, pdfCheck, Pdf2Json } from "./Functions/pdf-2-json.js";
+import promiseToCSV from './Functions/pdfPromise.js'; // promiseToCSV is the pdf load document Promise
 // 3rd Party:
 import cors from "cors";
 import Express from "express";
+
 // destruct/constants/variables
 const pdf_json_conv = Express.Router();
 let downloadFile = {};
+const typeRequired = "JSON";
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "Conversion", "UPLOAD");
+
+
 
 pdf_json_conv.post("/pdf-2-json", cors(), pdfUpload, async(req, res, next )=>{ 
  
@@ -31,8 +39,11 @@ pdf_json_conv.post("/pdf-2-json", cors(), pdfUpload, async(req, res, next )=>{
           });
           res.status(checker.code).send(checker.msg); 
           break; 
-          case "2":   
-          const newJsonFile = await Pdf2Json();
+          case "2": 
+		  const pdfLoader = join(conversionFolder, req.file.filename);
+		  const fileToCSV = await promiseToCSV(typeRequired, pdfLoader);
+		  const JsonContent = await fileToCSV.data;
+          const newJsonFile = await Pdf2Json(JsonContent);
 // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
         if(!newJsonFile.error) {  
           downloadFile = { ...newJsonFile };

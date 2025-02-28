@@ -123,8 +123,9 @@ async function Pdf2Json() {
 
     try{
        
-    const createJSON = jsonMaking(newJsonFile);
-    // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
+    // const createJSON = jsonMaking(newJsonFile);
+    const createJSON = await fse.writeJson(join(join(conversionFolder, "JSON"), newJsonName), content); 
+	/**
     if(createJSON.error) {
     result = {
     error: true,
@@ -133,7 +134,8 @@ async function Pdf2Json() {
     msg: "Something went wrong during the JSON file creation: " + createCSV.msg
         }
     return result
-    } else {
+    } else {}
+	**/
     result = {
     error: false,
     code: 201,
@@ -141,8 +143,8 @@ async function Pdf2Json() {
     uploadFolder: join(conversionFolder,"UPLOAD"),
     originalFilePath: join(join(conversionFolder,"UPLOAD"), newPdfFile),
     filePath: join(join(conversionFolder, "JSON"), newJsonFile),
-    msg: "PDF file successfully converted to JSON. Ready for download."}
-        }
+    msg: "PDF file successfully converted to JSON. Ready for download."
+	}
     return result    
     } catch(err) { 
         const errMsg = `: ${err.message}` || ". Check object above";

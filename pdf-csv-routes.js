@@ -6,18 +6,20 @@ import { emptyDir, remove } from "fs-extra";
 // import { pipeline } from "stream/promises";
 // Local:
 import { pdfUpload, pdfCheck, Pdf2Csv } from "./Functions/pdf-2-csv.js";
+import promiseToCSV from './Functions/pdfPromise.js';
 // 3rd Party:
 import cors from "cors";
 import Express from "express";
-import PDFParser from "pdf2json";
+
 
 // destruct/constants/variables
 const pdf_csv_conv = Express.Router();
 let downloadFile = {};
+const typeRequired = "CSV";
 const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "Conversion", "UPLOAD");
-const pdfParser = new PDFParser();
 
 // functions
+/*
 const pdfPromise = (filename) => {
 
 	return new Promise((resolve, reject) => {
@@ -40,10 +42,11 @@ const pdfPromise = (filename) => {
 		})
 	}
 	
-	const promiseToCSV = async(filename) => {
+	
+	const promiseToCSV = async(parser, filename) => {
 		const promiseResult = {};
 		try {
-		const promiseData = await pdfPromise(filename);
+		const promiseData = await pdfPromise(parser, filename);
 		const filePromise = await promiseData.data;
 			promiseResult.err = false;
 			promiseResult.data = filePromise;
@@ -55,6 +58,7 @@ const pdfPromise = (filename) => {
 		
 		return promiseResult
 	}
+	*/
 
 
 		pdf_csv_conv.options("/pdf-2-csv", cors())
@@ -78,8 +82,9 @@ const pdfPromise = (filename) => {
               });
               res.status(checker.code).send(checker.msg); 
               break; 
-              case "2":
-			  const fileToCSV = await promiseToCSV(req.file.filename);
+              case "2": 
+			  const pdfLoader = join(conversionFolder, req.file.filename);
+			  const fileToCSV = await promiseToCSV(typeRequired, pdfLoader);
               const newCsvFile = await Pdf2Csv(fileToCSV.data);
 			  // console.log('FNAME: ', fileToCSV)
     // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
