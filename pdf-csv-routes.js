@@ -1,4 +1,6 @@
 // Core:
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 // import { unlink } from "fs";
 import { emptyDir, remove } from "fs-extra";
 // import { pipeline } from "stream/promises";
@@ -7,9 +9,53 @@ import { pdfUpload, pdfCheck, Pdf2Csv } from "./Functions/pdf-2-csv.js";
 // 3rd Party:
 import cors from "cors";
 import Express from "express";
+import PDFParser from "pdf2json";
+
 // destruct/constants/variables
 const pdf_csv_conv = Express.Router();
 let downloadFile = {};
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "Conversion", "UPLOAD");
+const pdfParser = new PDFParser();
+
+// functions
+const pdfPromise = (filename) => {
+
+	return new Promise((resolve, reject) => {
+		
+		pdfParser.on("pdfParser_dataError", (err) => {
+			reject({
+				error: true,
+				msg: err.message || "Parsing PDF Data Rejection"
+			})
+		});
+		
+		pdfParser.on("pdfParser_dataReady", (pdfData) => {
+			resolve({
+				error: false,
+				data: pdfData.Pages[0].Texts
+				})
+		});
+
+	 pdfParser.loadPDF(join(conversionFolder, filename))
+		})
+	}
+	
+	const promiseToCSV = async(filename) => {
+		const promiseResult = {};
+		try {
+		const promiseData = await pdfPromise(filename);
+		const filePromise = await promiseData.data;
+			promiseResult.err = false;
+			promiseResult.data = filePromise;
+			// console.log("finally success: ", promiseResult)
+		} catch(err) {
+			promiseResult.err = true;
+			promiseResult.msg = `extraction Data error: ${err.message}` || "An error occured during data extraction."
+		}
+		
+		return promiseResult
+	}
+
 
 		pdf_csv_conv.options("/pdf-2-csv", cors())
         pdf_csv_conv.post("/pdf-2-csv", cors(), pdfUpload, async(req, res, next )=>{  
@@ -32,8 +78,10 @@ let downloadFile = {};
               });
               res.status(checker.code).send(checker.msg); 
               break; 
-              case "2":   
-              const newCsvFile = await Pdf2Csv();
+              case "2":
+			  const fileToCSV = await promiseToCSV(req.file.filename);
+              const newCsvFile = await Pdf2Csv(fileToCSV.data);
+			  // console.log('FNAME: ', fileToCSV)
     // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
              if(!newCsvFile.error) {
              downloadFile = { ...newCsvFile };
