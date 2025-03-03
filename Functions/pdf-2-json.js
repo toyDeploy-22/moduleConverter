@@ -63,7 +63,7 @@ const jsonPath = join(conversionFolder,"JSON");
 
 const contentToJson = (content, newStream) => {
 
-        const arrContent = content.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+        const arrContent = content.replaceAll(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
         
         const splittedArr = arrContent.split(" ").filter((wrd)=>wrd !== ""); 
 
@@ -73,20 +73,39 @@ const contentToJson = (content, newStream) => {
     
             for(i; i < newArr; i++){
                 if(mapArr.length > 2) {
-                    newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0])},\n`);
+                    newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0])},`);
                 } else {
                     newStream.write(`${JSON.stringify(mapArr.splice(0, 1)[0])}: ${JSON.stringify(mapArr.splice(0,1)[0]) || JSON.stringify("")}`);
-                    break;
                 }
             }
 }
 
-const jsonMaking = (newFileName) => {
-
-    const result = new Object();
-    const pdfPath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
+const jsonMaking = (content) => {
+	const result = new Object();
+	
+	try {
+    
+    // const pdfPath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
+	result.data = [];
+	for(let i = 0; i < content[0].texts.length; i++) {
+			let strPDF = content[0].texts[i].R[0].T;
+			let splitter = strPDF.split(/[%20%%22%]/g);
+			let noSpace = splitter.filter((wrd) => wrd !== "");
+			let pdfSpaces = noSpace.join(" ");
+			let pdfObject = { [`line${i}`]: pdfSpaces };
+			result.data.push(pdfObject)
+	}
+	result.err = false;
+	return result
+	} catch(err) {
+		console.error(err);
+		const ErrMsg = err.msg || "Error during object creation: Please check object above"
+		result.err = false;
+		result.msg = ErrMsg;
+		return result
+	}
 
         /*
     pdfUtil.pdfToText(pdfPath, function(err, data) {
@@ -117,14 +136,16 @@ const jsonMaking = (newFileName) => {
     */
 }
 
-async function Pdf2Json() { 
+async function Pdf2Json(content) { 
     
     let result ={};
 
     try{
        
     // const createJSON = jsonMaking(newJsonFile);
-    const createJSON = await fse.writeJson(join(join(conversionFolder, "JSON"), newJsonName), content); 
+	const createObj = await jsonMaking(content);
+	const getObj = await createObj.data;
+    const createJSON = await fse.writeJson(join(jsonPath, newJsonFile), getObj); 
 	/**
     if(createJSON.error) {
     result = {

@@ -132,10 +132,9 @@ async function Pdf2Csv(data) {
     let result = {};
 
     try{
-	let i = 0;
 	const bufferWriteStream = createWriteStream(join(csvPath, newCsvFile));
 	
-	for(i; i < data.length; i++) {
+	for(let i = 0; i < data.length; i++) {
 			let strPDF = data[i].R[0].T;
 			let splitter = strPDF.split(/[%20%%22%]/g);
 			let noSpace = splitter.filter((wrd) => wrd !== "");

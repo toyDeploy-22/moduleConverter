@@ -4,7 +4,7 @@ import PDFParser from "pdf2json";
 let promiseResult = {};
 
 
-const pdfPromise = (type, file) => {
+const pdfPromise = (typeRequested, file) => {
 	
 	const pdfParser = new PDFParser();
 	if(promiseResult.hasOwnProperty('err')) { promiseResult = new Object()};
@@ -21,7 +21,12 @@ const pdfPromise = (type, file) => {
 		pdfParser.on("pdfParser_dataReady", (pdfData) => {
 			resolve({
 				error: false,
-				data: type === 'JSON' ? JSON.stringify(pdfData) : pdfData.Pages[0].Texts
+				data: typeRequested === "JSON" ? [{
+					infos: [{
+						...pdfData.Meta,
+						...pdfData.Metadata }],
+					texts: pdfData.Pages[0].Texts
+				}] : pdfData.Pages[0].Texts
 				})
 		});
 
@@ -29,20 +34,20 @@ const pdfPromise = (type, file) => {
 		})
 	}
 	
-		const promiseToCSV = async(typeNeeded, filename) => {
+		const promiseToCSV = async(type, filename) => {
 		
 		try {
-		const promiseData = await pdfPromise(typeNeeded, filename);
-		const filePromise = await promiseData.data;
+		const promiseData = await pdfPromise(type, filename);
+		const filePromise = await promiseData.data; // systematically type of array array
 		
 			promiseResult = {
 			err: false,
 			data: filePromise
 			}
-			// console.log("finally success: ", promiseResult)
+			// console.log("finally success: ", promiseResult.data)
 		} catch(err) {
 			promiseResult = {
-			err: true;
+			err: true,
 			msg: `extraction Data error: ${err.message}` || "An error occured during data extraction."
 			}
 		}
