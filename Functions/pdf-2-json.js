@@ -143,9 +143,10 @@ async function Pdf2Json(content) {
     try{
        
     // const createJSON = jsonMaking(newJsonFile);
-	const createObj = await jsonMaking(content);
-	const getObj = await createObj.data;
-    const createJSON = await fse.writeJson(join(jsonPath, newJsonFile), getObj); 
+	const createObj = jsonMaking(content);
+	const createJSON = await createObj.data;
+    
+    await fse.writeJson(join(jsonPath, newJsonFile), createJSON); 
 	/**
     if(createJSON.error) {
     result = {

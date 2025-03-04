@@ -61,11 +61,30 @@ function pdfCheck(file) {
 const newTxtFile = "New_Convert-" + d.getTime() + ".txt"; 
 const txtPath = join(conversionFolder,"TXT");
 
-const txtMaking = (newFileName) => {
+const txtMaking = (content) => {
+	// console.log(content)
+	let result = {data: []};
+	try {
 
     const pdfPath = join(join(conversionFolder,"UPLOAD"), newPdfFile);
-
-    let result = {};
+	
+	for(let i = 0; i < content.length; i++) {
+			let strPDF = content[i].R[0].T;
+			let splitter = strPDF.split(/[%20%%22%]/g);
+			let noSpace = splitter.filter((wrd) => wrd !== "");
+			let pdfSpaces = noSpace.join(" ");
+			result.data.push(pdfSpaces)
+	}
+	result.error = false;
+	return result
+	} catch(err) {
+		console.error(err);
+		const ErrMsg = "An error occured during TEXT creation: " + err.message || "An error occured: Please check error object above";
+		result.error = true;
+		result.msg = ErrMsg;
+		return result		
+	}
+			
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
 
@@ -97,30 +116,33 @@ const txtMaking = (newFileName) => {
     return result
 }
 
-async function Pdf2Txt() { 
+async function Pdf2Txt(content) { 
     
     let result = {};
 
     try{
-       
-    const createTXT = txtMaking(newTxtFile);
+    
+    const createCont = await txtMaking(content);
     // await writeFile(join(join(conversionFolder, "./JSON"), newJsonName), jsonBuffer); 
-    if(createTXT.error) {
+    if(createCont.error) {
     result = {
     error: true,
     code: 401,
     uploadFolder: join(conversionFolder,"UPLOAD"),
-    msg: "Something went wrong during the TXT creation: " + createTXT.msg
+    msg: "Something went wrong during the TXT creation: " + createCont.msg
         }
     return result
     } else {
+	const createTXT = await createWriteStream(join(txtPath, newTxtFile));
+	await createCont.data.map((str) => createTXT.write(str));
+	
     result = {
     error: false,
     code: 201,
     newFileName: newTxtFile,
     uploadFolder: join(conversionFolder,"UPLOAD"),
-    originalFilePath: join(join(conversionFolder,"UPLOAD"), newPdfFile),
-    filePath: join(join(conversionFolder, "TXT"), newTxtFile),
+    originalFilePath: join(conversionFolder,"UPLOAD", newPdfFile),
+    filePath: join(txtPath, newTxtFile),
     msg: "PDF file successfully converted to TXT. Ready for download."}
     return result
     }} catch(err) { 
@@ -130,7 +152,7 @@ async function Pdf2Txt() {
         error: true,
         code: 500, 
         uploadFolder: join(conversionFolder,"UPLOAD"),
-        originalFilePath: join(join(conversionFolder,"UPLOAD"), newPdfFile),
+        originalFilePath: join(conversionFolder,"UPLOAD", newPdfFile),
         msg: "The conversion process stopped due to the following issue: " + errMsg}
         return result;
     }

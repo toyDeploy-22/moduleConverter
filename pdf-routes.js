@@ -3,14 +3,21 @@
 import { emptyDir, remove } from "fs-extra";
 // import { pipeline } from "stream/promises";
 // Local:
+import { dirname, join } from "path";
+import { fileURLToPath } from 'url'; 
+import promiseToCSV from './Functions/pdfPromise.js'; // promiseToCSV is the pdf load document Promise
 import { jsonUpload, jsonCheck, Json2Pdf } from "./Functions/json-2-pdf.js";
 import { pdfUpload, pdfCheck, Pdf2Txt } from "./Functions/pdf-2-txt.js";
 // 3rd Party:
 import cors from "cors";
 import Express from "express";
+
 // destruct/constants/variables
 const pdf_convertions = Express.Router();
 let downloadFile = {};
+const typeRequired = "TXT";
+
+const conversionFolder = join(dirname(fileURLToPath(import.meta.url)), "Conversion");
 
 pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>{ 
  
@@ -18,7 +25,7 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
         if(req.file.originalname) {
           console.log(req.body, req.file); 
         const checker = jsonCheck(req.file); 
-        console.log("JSON checker :" + checker);
+        // console.log("JSON checker :" + checker);
 
         switch (checker.code.toString()[0]) {
           case "4": 
@@ -162,7 +169,9 @@ pdf_convertions.post("/json-2-pdf", cors(), jsonUpload, async(req, res, next )=>
               res.status(checker.code).send(checker.msg); 
               break; 
               case "2":   
-              const newTxtFile = await Pdf2Txt();
+			  const pdfFile = join(conversionFolder, "UPLOAD", req.file.filename);
+			  const pdfLoad = await promiseToCSV(typeRequired, pdfFile);
+              const newTxtFile = await Pdf2Txt(pdfLoad.data);
     // can use "res.download(newFile.file.toString());" but nothing can be done after it, contrary to res.writeHead.
              if(!newTxtFile.error) {
              downloadFile = {...newTxtFile};
