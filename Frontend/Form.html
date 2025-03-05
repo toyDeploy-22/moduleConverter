@@ -42,6 +42,25 @@ display: block;
 font-weight: bold;
 }
 
+p:first-of-type {
+margin: .5em auto;
+}
+
+select#fileSelection {
+width: 25%;
+}
+
+select#fileSelection option:enabled {
+font-family: Arial Black, Arial, Helvetica, sans-serif;
+font-size: 1em; /* reminder */
+color: #26867c;
+}
+
+select#fileSelection option:disabled {
+font-family: 'Courier New', Courier, monospace;
+font-size: .8em;
+}
+
 p[value="ok"] {
 color: green;
 }
