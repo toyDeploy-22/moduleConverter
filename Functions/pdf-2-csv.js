@@ -63,8 +63,11 @@ const csvPath = join(conversionFolder,"CSV");
 
 const contentToCsv = (content) => {
     try {
-    const csvContent = content.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
-    return csvContent.split(" ");
+    // const csvContent = content.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+    // const splitter = content.split(" ");
+	// const noSpaces = splitter.filter((str) => str !== "").join(" ");
+	const noSpaces = content.trim();
+	return noSpaces
     // return csvContent.join(",");
     } catch(err) {
         const errMsg = `: ${err.message}` || ". Check object above";
@@ -136,11 +139,9 @@ async function Pdf2Csv(data) {
 	
 	for(let i = 0; i < data.length; i++) {
 			let strPDF = data[i].R[0].T;
-			let splitter = strPDF.split(/[%20%%22%]/g);
-			let noSpace = splitter.filter((wrd) => wrd !== "");
-			let pdfSpaces = noSpace.join(" ");
+			let pdfSpaces = decodeURIComponent(strPDF);
 			let pdf2CSV = contentToCsv(pdfSpaces);
-			data.length - 1 === i ? bufferWriteStream.write(`"${pdf2CSV.join(" ")}"`) : bufferWriteStream.write(`"${pdf2CSV.join(" ")}", `)
+			data.length - 1 === i ? bufferWriteStream.write(`"${pdf2CSV}"`) : bufferWriteStream.write(`"${pdf2CSV}", `)
 	}
 	
 	/*

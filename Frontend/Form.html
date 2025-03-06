@@ -42,12 +42,14 @@ display: block;
 font-weight: bold;
 }
 
-p:first-of-type {
-margin: .5em auto;
+h2 {
+margin: 1em auto;
 }
 
 select#fileSelection {
 width: 25%;
+height: 1.5em;
+text-align: center;
 }
 
 select#fileSelection option:enabled {
@@ -76,11 +78,17 @@ font-weight: bold;
 a.fileLink {
 text-decoration: none;
 }
+
+@media (max-width: 1000px) {
+	h2 {
+	margin: .25em auto;
+	}
+}
 </style>
 </head>
 <body>
 <form enctype="multipart/form-data">
-<p><b>Please select the format of the file you want</b></p>
+<h2>Please select the format desired:</h2>
 <label for="fileSelection"></label>
 <select id="fileSelection">
 <option value="">Select here</option>
@@ -119,10 +127,10 @@ text-decoration: none;
 <script>
 
 const form = document.getElementsByTagName("form")[0];
-const userSelection = document.getElementsByTagName("p")[1];
-const success = document.getElementsByTagName("p")[2];
-const failure = document.getElementsByTagName("p")[3];
-const waitingMsg = document.getElementsByTagName("p")[4];
+const userSelection = document.getElementsByTagName("p")[0];
+const success = document.getElementsByTagName("p")[1];
+const failure = document.getElementsByTagName("p")[2];
+const waitingMsg = document.getElementsByTagName("p")[3];
 const myFile = document.getElementsByTagName("input")[0];
 const format = document.getElementById("fileSelection");
 let waitEvent = false;
@@ -169,17 +177,17 @@ url: "json-2-txt"
 },
 {
 id: "PdftoTxt",
-description: "From PDF to TXT",
+description: "From PDF to TXT (One PDF page per conversion only)",
 url: "pdf-2-txt"
 },
 {
 id: "PdftoJson",
-description: "From PDF to JSON",
+description: "From PDF to JSON (One PDF page per conversion only)",
 url: "pdf-2-json"
 },
 {
 id: "PdftoCsv",
-description: "From PDF to CSV",
+description: "From PDF to CSV (One PDF page per conversion only)",
 url: "pdf-2-csv"
 },
 {
