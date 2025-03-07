@@ -70,10 +70,12 @@ const txtMaking = (content) => {
 	
 	for(let i = 0; i < content.length; i++) {
 			let strPDF = content[i].R[0].T;
-			let splitter = strPDF.split(/[%20%%22%]/g);
-			let noSpace = splitter.filter((wrd) => wrd !== "");
-			let pdfSpaces = noSpace.join(" ");
-			result.data.push(pdfSpaces)
+			// let splitter = strPDF.split(/[%20%%22%]/g);
+			let splitter = decodeURIComponent(strPDF);
+			// let noSpace = splitter.filter((wrd) => wrd !== "");
+			let noSpace = splitter.trim();
+			// let pdfSpaces = noSpace.join(" ");
+			result.data.push(noSpace)
 	}
 	result.error = false;
 	return result

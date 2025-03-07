@@ -28,5 +28,6 @@ _This is an experiment app that converts ```.js```, ```.txt```, ```.json```, ```
 - The new converted file will be created in ```Conversion``` folder, inside the folder that has the name of the target extension file
 - The new created file will have a name that starts with ```New_Convert-```
 - Once the new file is downloaded, its copy, plus the copy of the uploaded file, are automatically deleted
+- In case of error during the process, the copy of the uploaded file is also destroyed
 <br />
 
