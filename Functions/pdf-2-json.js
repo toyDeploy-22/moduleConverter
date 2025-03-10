@@ -89,14 +89,19 @@ const jsonMaking = (content) => {
          //Omit option to extract all text from the pdf file
         //Omit option to extract all text from the pdf file
 	result.data = [];
+	let pdfObject = {};
 	for(let i = 0; i < content[0].texts.length; i++) {
+			let newPair = Object.create({}); 
 			let strPDF = content[0].texts[i].R[0].T;
-			let splitter = strPDF.split(/[%20%%22%]/g);
-			let noSpace = splitter.filter((wrd) => wrd !== "");
-			let pdfSpaces = noSpace.join(" ");
-			let pdfObject = { [`line${i}`]: pdfSpaces };
-			result.data.push(pdfObject)
+			// let splitter = strPDF.split(/[%20%%22%]/g);
+			let splitter = decodeURIComponent(strPDF);
+			// let noSpace = splitter.filter((wrd) => wrd !== "");
+			let noSpace = splitter.trim();
+			// let pdfSpaces = noSpace.join(" ");
+			newPair[`line_${i}`] = noSpace;
+			Object.assign(pdfObject, newPair);
 	}
+	result.data.push(pdfObject);
 	result.err = false;
 	return result
 	} catch(err) {

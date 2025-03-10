@@ -1,11 +1,5 @@
 <!doctype html>
 <html>
-<!-- 
-missing convertions:
-csv to json
-json to txt
-javascript to txt
--->
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
@@ -102,6 +96,7 @@ text-decoration: none;
 <option value="CsvtoTxt">From CSV to TXT</option>
 <option value="CsvtoPdf">From CSV to PDF</option>
 <option disabled value="">--convert PDF--</option>
+<option value="PdftoJs">From PDF to Javascript </option>
 <option value="PdftoTxt">From PDF to TXT </option>
 <option value="PdftoCsv">From PDF to CSV </option>
 <option value="PdftoJson">From PDF to JSON </option>
@@ -184,6 +179,11 @@ url: "pdf-2-txt"
 id: "PdftoJson",
 description: "From PDF to JSON (One PDF page per conversion only)",
 url: "pdf-2-json"
+},
+{
+id: "PdftoJs",
+description: "From PDF to Javascript (One PDF page per conversion only)",
+url: "pdf-2-js"
 },
 {
 id: "PdftoCsv",
@@ -344,5 +344,11 @@ setTimeout(sendFile, 2000)
 
 form.addEventListener("submit", sendFileAsync);
 </script>
+<noscript>
+<div style="display: flex; flex-direction: column; align-items: center;">
+<h5 style="padding-top: 1em">Please enable Javascript to use this converter.</h5>
+<p><i>(<a href="https://www.enable-javascript.com/">Find help here</a>)</i></p>
+</div>
+</noscript>
 </body>
 </html>
