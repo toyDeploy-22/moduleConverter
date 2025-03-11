@@ -22,8 +22,14 @@ font-style: initial;
 color: darkblue;
 }
 
+.almostSelected {
+color: blueviolet;
+font-weight: bold;
+}
+
 .notSelected {
 color: gold;
+text-shadow: black 1px 1px;
 font-weight: bold;
 }
 
@@ -82,13 +88,14 @@ text-decoration: none;
 </head>
 <body>
 <form enctype="multipart/form-data">
-<h2>Please select the format desired:</h2>
+<h2>Please select the desired format:</h2>
 <label for="fileSelection"></label>
 <select id="fileSelection">
 <option value="">Select here</option>
 <option disabled value="">-- convert JAVASCRIPT --</option>
 <option value="JstoJson">From Javascript to JSON</option>
 <option value="JstoCsv">From Javascript to CSV</option>
+<option value="JstoPdf">From Javascript to PDF</option>
 <option value="JstoTxt">From Javascript to TXT</option>
 <option disabled value="">-- convert CSV --</option>
 <option value="CsvtoJs">From CSV to Javascript</option>
@@ -149,6 +156,11 @@ url: "js-2-csv"
 id: "JstoTxt",
 description: "From Javascript to TXT",
 url: "js-2-txt"
+}, 
+{
+id: "JstoPdf",
+description: "From Javascript to PDF",
+url: "js-2-pdf"
 }, 
 {
 id: "CsvtoJs",
@@ -250,7 +262,7 @@ downloadLink.setAttribute("download", "");
 downloadLink.setAttribute("href", "");
 
 if(!conversion.status){
-userSelection.setAttribute("class", "notSelected");
+userSelection.setAttribute("class", "almostSelected");
 userSelection.innerHTML = "Now, you just need to select a type of conversion to proceed."
 } 
 /**

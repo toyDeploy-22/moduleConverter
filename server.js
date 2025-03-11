@@ -10,6 +10,7 @@ import csv_txt_conv from './csv-txt-routes.js';
 import txt_csv_conv from './txt-csv-routes.js';
 import Csv_json_conv from './csv-json-routes.js';
 import Js_Txt_conv from './js-txt-routes.js';
+import js_pdf_conv from './js-2-pdf-routes.js';
 import csv_pdf_conv from './csv-pdf-routes.js';
 import pdf_csv_conv from './pdf-csv-routes.js';
 import pdf_json_conv from './pdf-json-routes.js';
@@ -25,6 +26,7 @@ const myServer = Express();
 const myPort = MY_PORT || 5000;
 const convertions = [
     Js_Txt_conv,
+	js_pdf_conv,
     Json_convertions,
     Json_csv_conv,
     Json_txt_conv,
