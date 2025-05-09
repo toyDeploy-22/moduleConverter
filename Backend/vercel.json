@@ -9,7 +9,7 @@
  {
  "src": "/(.*)",
 "dest": "server.js",
-"methods": [ "POST", "OPTIONS"]
+"methods": [ "GET", "POST", "OPTIONS"]
  }
  ],
  "buildCommand": "npm install --prefix Backend"
