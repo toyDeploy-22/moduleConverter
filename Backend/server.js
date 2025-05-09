@@ -1,4 +1,8 @@
 // Core:
+import { dirname } from 'dirname';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+ 
 // Local:
 import Json_convertions from "./json-routes.js";
 import csv_convertions from "./csv-routes.js";
@@ -41,13 +45,26 @@ const convertions = [
     pdf_csv_conv,
     pdf_json_conv,
 	pdf_Js_conv
-]
+];
+
+const successfulPage = join(dirname(fileURLToPath(import.meta.url)), "htmlSuccessPage.html");
+
 // middlewares
 myServer.use(Express.json());
 convertions.forEach((convert)=>myServer.use("/convert", convert))
 
 myServer.use(sendError);
 // server
+
+myServer.get("/", (req, res) => {
+	try {
+		res.sendFile(successfulPage)
+	} catch(err) {
+		console.error(err)
+		res.status(500).send("Oooops! The page cannot open due to an error. Please try to refresh the page and contact your administrator if this issue persists.")
+	}
+})
+
 myServer.listen(myPort, ()=>{
     console.log("Converter Module is on")
 })
