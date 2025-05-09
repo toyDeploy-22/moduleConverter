@@ -1,6 +1,5 @@
 // Core:
-import { dirname } from 'dirname';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
  
 // Local:
