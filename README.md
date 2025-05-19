@@ -25,9 +25,11 @@ _This is an experiment app that converts ```.js```, ```.txt```, ```.json```, ```
 ### Characteristics ###
 
 - The type of the file source and the extension source selected in the list **have to be the same** _(a MIME type check is launched during each conversion)_ 
-- A copy of the uploaded file will appear in ```Conversion\UPLOAD``` path of this project during the upload and download process. However:
-        - Once the new file is downloaded, its copy, plus the copy of the uploaded file, are automatically deleted
-        - In case of error during the process, the copy of the uploaded file is also destroyed
+- A copy of the uploaded file will appear in ```Conversion\UPLOAD``` path of this project during the upload and download process. However: 
+
+   * Once the new file is downloaded, its copy, and additionally the copy of the uploaded file, are automatically deleted
+   * In case of error during the process, the copy of the uploaded file is also destroyed
+
 - The new converted file will be created in ```Conversion``` folder in this project, inside the folder that has the name of the target extension file
 - The new created file will have a name that starts with ```New_Convert-```
 <br />
