@@ -3,7 +3,7 @@
 
 ### Purpose ###
 
-_This is an experiment app that converts ```.js```, ```.txt```, ```.json```, ```.csv```, and ```.pdf``` file extensions._
+_This is a simple FullStack project that converts ```.js```, ```.txt```, ```.json```, ```.csv```, and ```.pdf``` file extensions._
 
 ###### How to Convert ######
 
@@ -23,9 +23,9 @@ _This is an experiment app that converts ```.js```, ```.txt```, ```.json```, ```
    * CSS
    * Javascript
 
-2 - Backend
+2 - Backend (serverful)
    * NodeJS 
-   * NPM/Core modules
+   * 3rd Party/Core modules
 
 ### How it works ###
 
