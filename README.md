@@ -18,11 +18,16 @@ _This is an experiment app that converts ```.js```, ```.txt```, ```.json```, ```
 
 ### Technologies used ###
 
-- Html (used for the Frontend)
-- NodeJS (used for the backend)
-- Core modules for the backend
+1 - Frontend
+   * HTML
+   * CSS
+   * Javascript
 
-### Characteristics ###
+2 - Backend
+   * NodeJS 
+   * NPM/Core modules
+
+### How it works ###
 
 - The type of the file source and the extension source selected in the list **have to be the same** _(a MIME type check is launched during each conversion)_ 
 - A copy of the uploaded file will appear in ```Conversion\UPLOAD``` path of this project during the upload and download process. However: 
